@@ -1,0 +1,168 @@
+/* 全局应用样式 */
+.app {
+  min-height: 100vh;
+  background-color: #f9fbf8;
+}
+
+/* 深色模式 */
+.app.dark {
+  background-color: #1a261b;
+}
+
+.app.dark .bg-kid-bg {
+  background-color: #1a261b;
+}
+
+.app.dark .bg-white {
+  background-color: #2c3b2d;
+}
+
+.app.dark .text-kid-text {
+  color: #e8f0e7;
+}
+
+.app.dark .border-kid-border {
+  border-color: #3d4f3e;
+}
+
+.app.dark .bg-kid-border {
+  background-color: #3d4f3e;
+}
+
+.app.dark .bg-kid-border\/50 {
+  background-color: rgba(61, 79, 62, 0.5);
+}
+
+.app.dark .bg-kid-border\/30 {
+  background-color: rgba(61, 79, 62, 0.3);
+}
+
+.app.dark .text-kid-text\/60 {
+  color: rgba(232, 240, 231, 0.6);
+}
+
+.app.dark .text-kid-text\/50 {
+  color: rgba(232, 240, 231, 0.5);
+}
+
+.app.dark .text-kid-text\/40 {
+  color: rgba(232, 240, 231, 0.4);
+}
+
+.app.dark .text-kid-text\/70 {
+  color: rgba(232, 240, 231, 0.7);
+}
+
+/* 动画 */
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.4s ease-out forwards;
+}
+
+/* 软面板深色模式 */
+.app.dark .soft-panel {
+  background: rgba(44, 59, 45, 0.9);
+  border-color: rgba(100, 194, 112, 0.15);
+}
+
+/* 卡片深色模式 */
+.app.dark .story-card {
+  background-color: #2c3b2d;
+}
+
+.app.dark .category-tab:not(.active) {
+  background-color: #2c3b2d;
+  color: #e8f0e7;
+  border-color: #3d4f3e;
+}
+
+/* 输入框深色模式 */
+.app.dark .input-kid,
+.app.dark .select-kid {
+  background-color: #2c3b2d;
+  border-color: #3d4f3e;
+  color: #e8f0e7;
+}
+
+/* 底部导航深色模式 */
+.app.dark nav {
+  background-color: #2c3b2d;
+  border-color: #3d4f3e;
+}
+
+/* 模态框深色模式 */
+.app.dark .modal-content {
+  background-color: #2c3b2d;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 194, 112, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 194, 112, 0.5);
+}
+
+/* 选择文本样式 */
+::selection {
+  background: rgba(100, 194, 112, 0.3);
+  color: inherit;
+}
+
+/* 焦点样式 */
+*:focus-visible {
+  outline: 2px solid #64c270;
+  outline-offset: 2px;
+}
+
+/* 禁用状态 */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 图片加载占位 */
+img {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f0f9f0 100%);
+}
+
+/* 响应式调整 */
+@media (min-width: 640px) {
+  .story-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .story-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* 减少动画 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

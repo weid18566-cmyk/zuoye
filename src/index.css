@@ -1,0 +1,361 @@
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 儿童护眼浅色主题 */
+    --background: 100 20% 98%;
+    --foreground: 120 15% 25%;
+    --card: 0 0% 100%;
+    --card-foreground: 120 15% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 15% 25%;
+    --primary: 125 45% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 125 50% 70%;
+    --secondary-foreground: 120 15% 25%;
+    --muted: 120 30% 95%;
+    --muted-foreground: 120 10% 45%;
+    --accent: 125 50% 70%;
+    --accent-foreground: 120 15% 25%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 120 40% 93%;
+    --input: 120 40% 93%;
+    --ring: 125 45% 60%;
+    --radius: 2.5rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 120 15% 25%;
+    --sidebar-primary: 125 45% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 120 30% 95%;
+    --sidebar-accent-foreground: 120 15% 25%;
+    --sidebar-border: 120 40% 93%;
+    --sidebar-ring: 125 45% 60%;
+    
+    /* 自定义儿童色彩 */
+    --kid-primary: #64c270;
+    --kid-secondary: #8bd88f;
+    --kid-bg: #f9fbf8;
+    --kid-text: #3a4b39;
+    --kid-border: #e8f5e9;
+    --kid-card: #ffffff;
+  }
+
+  .dark {
+    /* 儿童护眼深色主题 */
+    --background: 120 20% 12%;
+    --foreground: 120 20% 93%;
+    --card: 120 15% 20%;
+    --card-foreground: 120 20% 93%;
+    --popover: 120 15% 20%;
+    --popover-foreground: 120 20% 93%;
+    --primary: 125 45% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 125 30% 35%;
+    --secondary-foreground: 120 20% 93%;
+    --muted: 120 15% 25%;
+    --muted-foreground: 120 15% 65%;
+    --accent: 125 30% 35%;
+    --accent-foreground: 120 20% 93%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 120 15% 27%;
+    --input: 120 15% 27%;
+    --ring: 125 45% 60%;
+    --sidebar-background: 120 15% 15%;
+    --sidebar-foreground: 120 20% 93%;
+    --sidebar-primary: 125 45% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 120 15% 25%;
+    --sidebar-accent-foreground: 120 20% 93%;
+    --sidebar-border: 120 15% 27%;
+    --sidebar-ring: 125 45% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply bg-kid-bg text-kid-text font-body;
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  /* 隐藏滚动条但保持滚动功能 */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* 软面板 - 替代毛玻璃 */
+  .soft-panel {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(100, 194, 112, 0.2);
+    border-radius: 40px;
+  }
+  
+  .dark .soft-panel {
+    background: rgba(44, 59, 45, 0.9);
+    border: 1px solid rgba(100, 194, 112, 0.15);
+  }
+  
+  /* 主按钮样式 */
+  .btn-primary {
+    @apply bg-gradient-to-r from-kid-primary to-kid-secondary text-white font-medium;
+    @apply rounded-kid-lg px-8 py-4 min-h-[56px];
+    @apply shadow-kid-btn transition-all duration-300;
+    @apply flex items-center justify-center gap-2;
+    font-size: 20px;
+  }
+  
+  .btn-primary:hover {
+    @apply shadow-kid-lg scale-[1.03];
+  }
+  
+  .btn-primary:active {
+    @apply scale-95;
+  }
+  
+  /* 次按钮样式 */
+  .btn-secondary {
+    @apply bg-transparent text-kid-primary border-2 border-kid-primary;
+    @apply rounded-kid-lg px-8 py-4 min-h-[56px];
+    @apply transition-all duration-300;
+    @apply flex items-center justify-center gap-2;
+    font-size: 20px;
+  }
+  
+  .btn-secondary:hover {
+    @apply bg-kid-primary/10 scale-[1.03];
+  }
+  
+  .btn-secondary:active {
+    @apply scale-95;
+  }
+  
+  /* 图标按钮 */
+  .btn-icon {
+    @apply w-14 h-14 rounded-full bg-kid-border/50;
+    @apply flex items-center justify-center;
+    @apply transition-all duration-200;
+  }
+  
+  .btn-icon:hover {
+    @apply bg-kid-primary/20 scale-110;
+  }
+  
+  .btn-icon:active {
+    @apply scale-95;
+  }
+  
+  /* 故事卡片 */
+  .story-card {
+    @apply bg-white rounded-kid-lg p-4;
+    @apply shadow-kid transition-all duration-300;
+  }
+  
+  .story-card:hover {
+    @apply shadow-kid-lg -translate-y-1;
+  }
+  
+  /* 卡片封面 */
+  .story-cover {
+    @apply aspect-square rounded-kid-md overflow-hidden;
+    @apply bg-gradient-to-br from-kid-border to-kid-bg;
+  }
+  
+  /* 分类标签 */
+  .category-tab {
+    @apply px-6 py-3 rounded-full text-kid-sm font-medium;
+    @apply transition-all duration-300 whitespace-nowrap;
+    @apply border-2 border-transparent;
+  }
+  
+  .category-tab.active {
+    @apply bg-kid-primary text-white border-kid-primary;
+  }
+  
+  .category-tab:not(.active) {
+    @apply bg-white text-kid-text border-kid-border;
+  }
+  
+  .category-tab:not(.active):hover {
+    @apply border-kid-primary/50;
+  }
+  
+  /* 适龄标签 */
+  .age-badge {
+    @apply px-3 py-1 rounded-full text-kid-xs;
+    @apply bg-kid-secondary/30 text-kid-text;
+  }
+  
+  /* 顶部渐变 */
+  .gradient-top {
+    background: linear-gradient(180deg, #e8f5e9 0%, transparent 100%);
+  }
+  
+  /* 底部导航 */
+  .nav-item {
+    @apply flex flex-col items-center gap-1;
+    @apply transition-all duration-300;
+  }
+  
+  .nav-item.active {
+    @apply text-kid-primary;
+  }
+  
+  .nav-item:not(.active) {
+    @apply text-kid-text/50;
+  }
+  
+  /* 滑块样式 */
+  .slider-track {
+    @apply h-3 rounded-full bg-kid-border;
+  }
+  
+  .slider-thumb {
+    @apply w-7 h-7 rounded-full bg-white shadow-md;
+    @apply border-2 border-kid-primary;
+  }
+  
+  /* 开关样式 */
+  .switch-track {
+    @apply w-14 h-8 rounded-full transition-colors duration-300;
+  }
+  
+  .switch-thumb {
+    @apply w-7 h-7 rounded-full bg-white shadow-md transition-transform duration-300;
+  }
+  
+  /* 输入框 */
+  .input-kid {
+    @apply h-14 px-6 rounded-kid-md border-2 border-kid-border;
+    @apply text-kid-sm bg-white;
+    @apply transition-all duration-300;
+    @apply focus:outline-none focus:border-kid-primary focus:ring-2 focus:ring-kid-primary/20;
+  }
+  
+  /* 下拉框 */
+  .select-kid {
+    @apply h-14 px-6 rounded-kid-md border-2 border-kid-border;
+    @apply text-kid-sm bg-white;
+    @apply transition-all duration-300;
+    @apply focus:outline-none focus:border-kid-primary;
+  }
+  
+  /* 进度条 */
+  .progress-bar {
+    @apply h-1.5 rounded-full bg-kid-border overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full rounded-full bg-kid-primary transition-all duration-500;
+  }
+  
+  /* 弹窗 */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/30 backdrop-blur-sm z-50;
+    @apply flex items-center justify-center p-5;
+  }
+  
+  .modal-content {
+    @apply bg-white rounded-kid-xl p-6 w-full max-w-sm;
+    @apply shadow-kid-lg;
+  }
+  
+  /* 加载动画 */
+  .loading-spinner {
+    @apply w-12 h-12 rounded-full border-4 border-kid-border;
+    @apply border-t-kid-primary animate-spin-slow;
+  }
+  
+  /* 云朵装饰 */
+  .cloud {
+    @apply absolute opacity-60;
+    @apply animate-float-x;
+  }
+  
+  /* 涟漪效果 */
+  .ripple {
+    @apply absolute rounded-full bg-kid-primary/30 pointer-events-none;
+    @apply animate-ping;
+  }
+}
+
+@layer utilities {
+  /* 文字阴影 - 增强可读性 */
+  .text-shadow-soft {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 动画延迟 */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+  
+  /* 过渡时长 */
+  .duration-kid { transition-duration: 400ms; }
+  .duration-kid-slow { transition-duration: 600ms; }
+  
+  /* 禁用选择 - 防止儿童误操作 */
+  .no-select {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  /* 安全区域 */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 20px);
+  }
+}
+
+/* Material Symbols 图标 */
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-rounded.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
