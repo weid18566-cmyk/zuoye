@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode } from '@/types';
+import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { safeJsonParse } from '@/lib/utils';
 
 const defaultAIConfig: AIConfig = {
   model: 'claude',
@@ -8,62 +10,116 @@ const defaultAIConfig: AIConfig = {
   maxSessionDuration: 15,
 };
 
+function getStorageKey(userId: string, suffix: string): string {
+  return `kidstory-${userId}-${suffix}`;
+}
+
 export function useAppState() {
+  const { user } = useAuth();
+  const userId = user?.id || 'guest';
+
   // 主题状态
-  const [theme, setTheme] = useState<Theme>('light');
-  
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'theme'));
+    return saved === 'dark' ? 'dark' : 'light';
+  });
+
   // 当前页面
   const [currentPage, setCurrentPage] = useState<Page>('splash');
-  
+
+  // 视图配置
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'layoutMode'));
+    return (saved as LayoutMode) || 'grid';
+  });
+  const [sortOrder, setSortOrder] = useState<SortOrder>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'sortOrder'));
+    return (saved as SortOrder) || 'default';
+  });
+  const [viewScale, setViewScale] = useState<ViewScale>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'viewScale'));
+    return (saved as ViewScale) || 'medium';
+  });
+
   // AI配置
-  const [aiConfig, setAIConfig] = useState<AIConfig>(defaultAIConfig);
-  
+  const [aiConfig, setAIConfig] = useState<AIConfig>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'config'));
+    const parsed = safeJsonParse<Partial<AIConfig>>(saved, {});
+    return { ...defaultAIConfig, ...parsed };
+  });
+
   // 阅读进度
-  const [readingProgress, setReadingProgress] = useState<ReadingProgress[]>([]);
-  
+  const [readingProgress, setReadingProgress] = useState<ReadingProgress[]>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'progress'));
+    const parsed = safeJsonParse<ReadingProgress[]>(saved, []);
+    return Array.isArray(parsed) ? parsed : [];
+  });
+
   // 收藏列表
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
-  
+  const [favorites, setFavorites] = useState<Favorite[]>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'favorites'));
+    const parsed = safeJsonParse<Favorite[]>(saved, []);
+    return Array.isArray(parsed) ? parsed : [];
+  });
+
   // 当前阅读的故事和视角
   const [currentStoryId, setCurrentStoryId] = useState<string | null>(null);
   const [currentViewMode, setCurrentViewMode] = useState<ViewMode>('protagonist');
-  
+
   // 幼教模式
   const [isEducationMode, setIsEducationMode] = useState(false);
-  
+
   // 防沉迷计时
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
   const [showTimeLimitModal, setShowTimeLimitModal] = useState(false);
 
-  // 从 localStorage 加载数据
+  // 当用户切换时重新加载数据
   useEffect(() => {
-    const savedTheme = localStorage.getItem('kidstory-theme') as Theme;
-    const savedAIConfig = localStorage.getItem('kidstory-ai-config');
-    const savedProgress = localStorage.getItem('kidstory-progress');
-    const savedFavorites = localStorage.getItem('kidstory-favorites');
-    
-    if (savedTheme) setTheme(savedTheme);
-    if (savedAIConfig) setAIConfig(JSON.parse(savedAIConfig));
-    if (savedProgress) setReadingProgress(JSON.parse(savedProgress));
-    if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-  }, []);
+    const savedTheme = localStorage.getItem(getStorageKey(userId, 'theme'));
+    const savedConfig = localStorage.getItem(getStorageKey(userId, 'config'));
+    const savedProgress = localStorage.getItem(getStorageKey(userId, 'progress'));
+    const savedFavorites = localStorage.getItem(getStorageKey(userId, 'favorites'));
+
+    setTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+    const parsedConfig = safeJsonParse<Partial<AIConfig>>(savedConfig, {});
+    setAIConfig({ ...defaultAIConfig, ...parsedConfig });
+
+    const parsedProgress = safeJsonParse<ReadingProgress[]>(savedProgress, []);
+    setReadingProgress(Array.isArray(parsedProgress) ? parsedProgress : []);
+
+    const parsedFavorites = safeJsonParse<Favorite[]>(savedFavorites, []);
+    setFavorites(Array.isArray(parsedFavorites) ? parsedFavorites : []);
+  }, [userId]);
 
   // 保存到 localStorage
   useEffect(() => {
-    localStorage.setItem('kidstory-theme', theme);
-  }, [theme]);
+    localStorage.setItem(getStorageKey(userId, 'theme'), theme);
+  }, [theme, userId]);
 
   useEffect(() => {
-    localStorage.setItem('kidstory-ai-config', JSON.stringify(aiConfig));
-  }, [aiConfig]);
+    localStorage.setItem(getStorageKey(userId, 'config'), JSON.stringify(aiConfig));
+  }, [aiConfig, userId]);
 
   useEffect(() => {
-    localStorage.setItem('kidstory-progress', JSON.stringify(readingProgress));
-  }, [readingProgress]);
+    localStorage.setItem(getStorageKey(userId, 'progress'), JSON.stringify(readingProgress));
+  }, [readingProgress, userId]);
 
   useEffect(() => {
-    localStorage.setItem('kidstory-favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    localStorage.setItem(getStorageKey(userId, 'favorites'), JSON.stringify(favorites));
+  }, [favorites, userId]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey(userId, 'layoutMode'), layoutMode);
+  }, [layoutMode, userId]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey(userId, 'sortOrder'), sortOrder);
+  }, [sortOrder, userId]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey(userId, 'viewScale'), viewScale);
+  }, [viewScale, userId]);
 
   // 切换主题
   const toggleTheme = useCallback(() => {
@@ -120,13 +176,14 @@ export function useAppState() {
 
   // 检查使用时长
   useEffect(() => {
+    if (sessionStartTime <= 0) return;
     const checkTime = setInterval(() => {
       const elapsed = Date.now() - sessionStartTime;
       const maxDuration = aiConfig.maxSessionDuration * 60 * 1000;
       if (elapsed > maxDuration && currentPage === 'reading') {
         setShowTimeLimitModal(true);
       }
-    }, 60000); // 每分钟检查一次
+    }, 60000);
 
     return () => clearInterval(checkTime);
   }, [sessionStartTime, aiConfig.maxSessionDuration, currentPage]);
@@ -136,6 +193,8 @@ export function useAppState() {
     setCurrentStoryId(null);
     setCurrentPage('library');
     setIsEducationMode(false);
+    setSessionStartTime(0);
+    setShowTimeLimitModal(false);
   }, []);
 
   return {
@@ -161,5 +220,11 @@ export function useAppState() {
     showTimeLimitModal,
     setShowTimeLimitModal,
     goHome,
+    layoutMode,
+    setLayoutMode,
+    sortOrder,
+    setSortOrder,
+    viewScale,
+    setViewScale,
   };
 }

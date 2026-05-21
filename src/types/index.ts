@@ -3,7 +3,7 @@ export interface Story {
   id: string;
   title: string;
   cover: string;
-  category: 'grimm' | 'andersen' | 'chinese';
+  category: 'grimm' | 'andersen' | 'chinese' | 'fable';
   categoryName: string;
   ageRange: string;
   minAge: number;
@@ -68,8 +68,78 @@ export interface AIConfig {
 // 主题类型
 export type Theme = 'light' | 'dark';
 
+// 字体类型
+export type FontFamily = 'default' | 'serif' | 'sans' | 'mono' | 'cursive';
+
+// 语言类型
+export type Language = 'zh-CN' | 'en' | 'ja';
+
 // 页面类型
-export type Page = 'splash' | 'library' | 'reading' | 'education' | 'settings' | 'collection';
+export type Page = 'splash' | 'library' | 'reading' | 'education' | 'settings' | 'collection' |
+  'login' | 'register' | 'forgotPassword' | 'profile' | 'admin' | 'dataManager' | 'globalSettings';
+
+// 用户角色类型
+export type UserRole = 'admin' | 'parent' | 'child';
+
+// 用户类型
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  avatar: string;
+  createdAt: number;
+  status: 'active' | 'disabled';
+  parentId: string | null;
+}
+
+// 用户凭证（仅用于注册/登录）
+export interface UserCredential {
+  id: string;
+  passwordHash: string;
+  salt: string;
+}
+
+// 权限定义
+export interface Permission {
+  canRead: boolean;
+  canLike: boolean;
+  canManageSettings: boolean;
+  canManageUsers: boolean;
+  canManageData: boolean;
+}
+
+// 全局设置类型
+export interface GlobalSettings {
+  theme: Theme;
+  fontFamily: FontFamily;
+  language: Language;
+  fontSize: 'small' | 'medium' | 'large';
+  autoSaveInterval: number;
+  shortcuts: ShortcutConfig;
+}
+
+// 快捷键配置
+export interface ShortcutConfig {
+  toggleReading: string;
+  nextChapter: string;
+  prevChapter: string;
+  toggleFavorite: string;
+  goHome: string;
+}
+
+// 备份数据类型
+export interface BackupData {
+  version: string;
+  exportedAt: number;
+  users: (User & { passwordHash?: string; salt?: string })[];
+  userData: Record<string, {
+    readingProgress: ReadingProgress[];
+    favorites: Favorite[];
+    aiConfig: AIConfig;
+  }>;
+}
 
 // 幼教内容类型
 export interface EducationContent {
@@ -90,4 +160,64 @@ export interface Category {
   id: string;
   name: string;
   icon: string;
+}
+
+// 视图布局模式
+export type LayoutMode = 'grid' | 'list' | 'compact';
+
+// 排序方式
+export type SortOrder = 'default' | 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc' | 'recent';
+
+// 视图缩放比例
+export type ViewScale = 'small' | 'medium' | 'large';
+
+// 视图配置
+export interface ViewConfig {
+  layoutMode: LayoutMode;
+  sortOrder: SortOrder;
+  viewScale: ViewScale;
+  showFilters: boolean;
+}
+
+// Toast消息类型
+export interface ToastMessage {
+  id: string;
+  content: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  duration?: number;
+}
+
+// 新手引导步骤
+export interface OnboardingStep {
+  id: string;
+  target: string;
+  title: string;
+  content: string;
+  position: 'top' | 'bottom' | 'left' | 'right' | 'center';
+  icon?: string;
+}
+
+// 面包屑节点
+export interface BreadcrumbNode {
+  label: string;
+  page?: Page;
+  icon?: string;
+}
+
+// 导航菜单项
+export interface NavMenuItem {
+  id: Page;
+  label: string;
+  icon: string;
+  activeIcon?: string;
+  badge?: number;
+  children?: NavMenuSubItem[];
+  permission?: keyof Permission;
+}
+
+export interface NavMenuSubItem {
+  id: Page;
+  label: string;
+  icon: string;
+  permission?: keyof Permission;
 }

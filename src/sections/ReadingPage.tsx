@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { stories } from '@/data/stories';
-import type { ViewMode, Story } from '@/types';
+import type { ViewMode, Story, Choice } from '@/types';
 
 interface ReadingPageProps {
   storyId: string;
@@ -8,6 +8,7 @@ interface ReadingPageProps {
   onViewModeChange: (mode: ViewMode) => void;
   onBack: () => void;
   onComplete: () => void;
+  onProgress: (chapterId: string, progress: number) => void;
 }
 
 export function ReadingPage({ 
@@ -15,7 +16,8 @@ export function ReadingPage({
   viewMode, 
   onViewModeChange, 
   onBack,
-  onComplete 
+  onComplete,
+  onProgress,
 }: ReadingPageProps) {
   const story = stories.find(s => s.id === storyId);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
@@ -24,14 +26,36 @@ export function ReadingPage({
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
 
-  if (!story) return null;
+  if (!story || story.chapters.length === 0) {
+    return (
+      <div className="min-h-screen bg-kid-bg flex flex-col items-center justify-center gap-4">
+        <span className="material-symbols-rounded text-6xl text-kid-text/30">error</span>
+        <p className="text-kid-md text-kid-text/50">
+          {!story ? '故事未找到' : '该故事暂无章节'}
+        </p>
+        <button onClick={onBack} className="btn-primary">
+          <span className="material-symbols-rounded">arrow_back</span>
+          <span>返回</span>
+        </button>
+      </div>
+    );
+  }
 
   const currentChapter = story.chapters[currentChapterIndex];
+  if (!currentChapter) return null;
   const progress = ((currentChapterIndex + 1) / story.chapters.length) * 100;
+
+  const saveCurrentProgress = useCallback((idx: number) => {
+    const ch = story.chapters[idx];
+    if (!ch) return;
+    onProgress(ch.id, ((idx + 1) / story.chapters.length) * 100);
+  }, [story, onProgress]);
 
   const handleNext = () => {
     if (currentChapterIndex < story.chapters.length - 1) {
-      setCurrentChapterIndex(prev => prev + 1);
+      const next = currentChapterIndex + 1;
+      setCurrentChapterIndex(next);
+      saveCurrentProgress(next);
       setShowChoices(false);
     } else {
       onComplete();
@@ -40,13 +64,23 @@ export function ReadingPage({
 
   const handlePrev = () => {
     if (currentChapterIndex > 0) {
-      setCurrentChapterIndex(prev => prev - 1);
+      const prev = currentChapterIndex - 1;
+      setCurrentChapterIndex(prev);
+      saveCurrentProgress(prev);
       setShowChoices(false);
     }
   };
 
-  const handleChoice = () => {
+  const handleChoice = (choice: Choice) => {
     setShowChoices(false);
+    if (choice.nextChapterId) {
+      const targetIdx = story.chapters.findIndex(ch => ch.id === choice.nextChapterId);
+      if (targetIdx >= 0) {
+        setCurrentChapterIndex(targetIdx);
+        saveCurrentProgress(targetIdx);
+        return;
+      }
+    }
     handleNext();
   };
 
@@ -137,7 +171,7 @@ export function ReadingPage({
             {currentChapter.choices.map((choice, i) => (
               <button
                 key={choice.id}
-                onClick={handleChoice}
+                onClick={() => handleChoice(choice)}
                 className="w-full btn-secondary justify-start animate-fade-in-up"
                 style={{ animationDelay: `${i * 100}ms` }}
               >

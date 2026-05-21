@@ -1,19 +1,65 @@
+import { useEffect } from 'react';
 import { useAppState } from '@/hooks/useAppState';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ToastProvider, useToast } from '@/components/ui/toast';
+import { GuideOverlay } from '@/components/ui/tooltip-guide';
+import { PageTransition } from '@/components/ui/page-transition';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { SplashScreen } from '@/sections/SplashScreen';
 import { StoryLibrary } from '@/sections/StoryLibrary';
 import { ReadingPage } from '@/sections/ReadingPage';
 import { SettingsPage } from '@/sections/SettingsPage';
 import { CollectionPage } from '@/sections/CollectionPage';
-import { BottomNav } from '@/sections/BottomNav';
+import { LoginPage } from '@/sections/LoginPage';
+import { RegisterPage } from '@/sections/RegisterPage';
+import { ForgotPasswordPage } from '@/sections/ForgotPasswordPage';
+import { ProfilePage } from '@/sections/ProfilePage';
+import { AdminPage } from '@/sections/AdminPage';
+import { DataManagerPage } from '@/sections/DataManagerPage';
+import { GlobalSettingsPage } from '@/sections/GlobalSettingsPage';
+import { BottomNav, PAGE_BREADCRUMBS } from '@/sections/BottomNav';
 import { stories } from '@/data/stories';
+import type { Page } from '@/types';
 import './App.css';
 
-function App() {
+function Breadcrumb({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: Page) => void }) {
+  const info = PAGE_BREADCRUMBS[currentPage];
+  if (!info) return null;
+  if (['splash', 'login', 'register', 'library'].includes(currentPage)) return null;
+
+  const parent = info.parent ? PAGE_BREADCRUMBS[info.parent] : null;
+
+  return (
+    <div className="px-5 -mt-2 pb-3 relative z-10">
+      <div className="flex items-center gap-1.5 text-kid-xs text-kid-text/40">
+        <button onClick={() => onNavigate('library')} className="hover:text-kid-primary transition-colors flex items-center gap-1">
+          <span className="material-symbols-rounded text-sm">home</span>
+          <span>首页</span>
+        </button>
+        {parent && (
+          <>
+            <span className="material-symbols-rounded text-xs">chevron_right</span>
+            <button
+              onClick={() => parent.page && onNavigate(parent.page)}
+              className="hover:text-kid-primary transition-colors"
+            >
+              {parent.label}
+            </button>
+          </>
+        )}
+        <span className="material-symbols-rounded text-xs">chevron_right</span>
+        <span className="text-kid-text/60">{info.label}</span>
+      </div>
+    </div>
+  );
+}
+
+function AppContent() {
   const {
     theme,
     toggleTheme,
-    currentPage,
-    setCurrentPage,
+    currentPage: appPage,
+    setCurrentPage: setAppPage,
     aiConfig,
     updateAIConfig,
     readingProgress,
@@ -29,62 +75,134 @@ function App() {
     showTimeLimitModal,
     setShowTimeLimitModal,
     goHome,
+    layoutMode,
+    setLayoutMode,
+    sortOrder,
+    setSortOrder,
+    viewScale,
+    setViewScale,
   } = useAppState();
 
-  // 处理从开屏进入
-  const handleEnterFromSplash = () => {
-    setCurrentPage('library');
+  const { isAuthenticated, isLoading, setCurrentPage: setAuthPage, currentPage: authPage, hasPermission } = useAuth();
+  const { addToast } = useToast();
+  const {
+    showOnboarding,
+    currentStep,
+    steps,
+    nextStep,
+    prevStep,
+    completeOnboarding,
+  } = useOnboarding();
+
+  const currentPage = (() => {
+    if (isLoading) return 'splash';
+    if (authPage !== 'splash') return authPage;
+    return appPage;
+  })();
+
+  const handleSetPage = (page: Page) => {
+    setAppPage(page);
+    setAuthPage(page);
   };
 
-  // 处理选择故事
+  const handleEnterFromSplash = () => {
+    handleSetPage(isAuthenticated ? 'library' : 'login');
+  };
+
   const handleSelectStory = (storyId: string) => {
     startReading(storyId);
   };
 
-  // 处理收藏切换
   const handleToggleFavorite = (storyId: string) => {
     if (isFavorite(storyId)) {
       removeFavorite(storyId);
+      addToast('已取消收藏', 'info');
     } else {
       addFavorite(storyId);
+      addToast('已添加到收藏', 'success');
     }
   };
 
-  // 处理阅读完成
   const handleReadingComplete = () => {
     if (currentStoryId) {
+      const story = stories.find(s => s.id === currentStoryId);
+      const lastChapterId = story?.chapters?.[story.chapters.length - 1]?.id || '';
       saveProgress({
         storyId: currentStoryId,
-        chapterId: stories.find(s => s.id === currentStoryId)?.chapters[0].id || '',
+        chapterId: lastChapterId,
         characterId: currentViewMode,
         progress: 100,
         lastReadAt: Date.now(),
       });
     }
-    setCurrentPage('library');
+    handleSetPage('library');
+    addToast('阅读完成！下次可以从收藏中继续', 'success');
   };
 
-  // 渲染当前页面
+  const handleReadingProgress = (chapterId: string, progress: number) => {
+    if (!currentStoryId) return;
+    saveProgress({
+      storyId: currentStoryId,
+      chapterId,
+      characterId: currentViewMode,
+      progress,
+      lastReadAt: Date.now(),
+    });
+  };
+
+  // 修复：用 useEffect 处理 reading 页面无 storyId 的导航
+  useEffect(() => {
+    if (currentPage === 'reading' && !currentStoryId) {
+      setAppPage('library');
+      setAuthPage('library');
+    }
+  }, [currentPage, currentStoryId, setAppPage, setAuthPage]);
+
   const renderPage = () => {
     switch (currentPage) {
       case 'splash':
         return <SplashScreen onEnter={handleEnterFromSplash} />;
 
+      case 'login':
+        return <LoginPage />;
+
+      case 'register':
+        return <RegisterPage />;
+
+      case 'forgotPassword':
+        return <ForgotPasswordPage />;
+
+      case 'profile':
+        return <ProfilePage />;
+
+      case 'admin':
+        return <AdminPage />;
+
+      case 'dataManager':
+        return <DataManagerPage />;
+
+      case 'globalSettings':
+        return <GlobalSettingsPage />;
+
       case 'library':
         return (
           <StoryLibrary
             onSelectStory={handleSelectStory}
-            onOpenSettings={() => setCurrentPage('settings')}
+            onOpenSettings={() => handleSetPage('settings')}
+            onOpenProfile={() => handleSetPage('profile')}
             favorites={favorites.map(f => f.storyId)}
             onToggleFavorite={handleToggleFavorite}
+            layoutMode={layoutMode}
+            onLayoutModeChange={setLayoutMode}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            viewScale={viewScale}
+            onViewScaleChange={setViewScale}
           />
         );
 
       case 'reading':
-        if (!currentStoryId) {
-          setCurrentPage('library');
-          return null;
-        }
+        if (!currentStoryId) return null;
         return (
           <ReadingPage
             storyId={currentStoryId}
@@ -92,6 +210,7 @@ function App() {
             onViewModeChange={setCurrentViewMode}
             onBack={goHome}
             onComplete={handleReadingComplete}
+            onProgress={handleReadingProgress}
           />
         );
 
@@ -102,7 +221,7 @@ function App() {
             onUpdateAIConfig={updateAIConfig}
             theme={theme}
             onToggleTheme={toggleTheme}
-            onBack={() => setCurrentPage('library')}
+            onBack={() => handleSetPage('library')}
           />
         );
 
@@ -113,7 +232,7 @@ function App() {
             readingProgress={readingProgress}
             onSelectStory={handleSelectStory}
             onRemoveFavorite={removeFavorite}
-            onBack={() => setCurrentPage('library')}
+            onBack={() => handleSetPage('library')}
           />
         );
 
@@ -122,23 +241,47 @@ function App() {
     }
   };
 
+  const showBottomNav = !['splash', 'reading', 'settings', 'login', 'register', 'forgotPassword', 'admin', 'dataManager', 'globalSettings', 'profile'].includes(currentPage);
+  const showBottomNavAuth = isAuthenticated && showBottomNav;
+
   return (
     <div className={`app ${theme}`}>
-      {/* 主内容 */}
       <main className="min-h-screen">
-        {renderPage()}
+        <PageTransition pageKey={currentPage}>
+          {renderPage()}
+        </PageTransition>
       </main>
 
-      {/* 底部导航 - 只在特定页面显示 */}
-      {currentPage !== 'splash' && currentPage !== 'reading' && currentPage !== 'settings' && (
+      <Breadcrumb
+        currentPage={currentPage}
+        onNavigate={handleSetPage}
+      />
+
+      {showBottomNavAuth && (
         <BottomNav
           currentPage={currentPage}
-          onPageChange={setCurrentPage}
+          onPageChange={handleSetPage}
           favoriteCount={favorites.length}
+          readingStoryId={currentStoryId}
+          canManageUsers={hasPermission('canManageUsers')}
+          canManageData={hasPermission('canManageData')}
+          canManageSettings={hasPermission('canManageSettings')}
         />
       )}
 
-      {/* 防沉迷超时弹窗 */}
+      {/* 新手引导 */}
+      {showOnboarding && isAuthenticated && currentPage === 'library' && (
+        <GuideOverlay
+          show={showOnboarding}
+          onClose={completeOnboarding}
+          steps={steps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onPrev={prevStep}
+        />
+      )}
+
+      {/* 防沉迷弹窗 */}
       {showTimeLimitModal && (
         <div className="modal-overlay">
           <div className="modal-content text-center">
@@ -167,6 +310,16 @@ function App() {
         </div>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </AuthProvider>
   );
 }
 
