@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { exportAllData, downloadBackup, importAllData } from '@/lib/backup';
 import { saveLocalBackup, restoreLocalBackup, hasLocalBackup, clearLocalBackup } from '@/lib/backup';
@@ -15,6 +15,12 @@ export function DataManagerPage() {
     setMessage(msg);
     setTimeout(() => setMessage(''), 3000);
   };
+
+  useEffect(() => {
+    const handleStorage = () => setLocalHasBackup(hasLocalBackup());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const handleExport = async () => {
     setLoading(true);

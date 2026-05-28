@@ -18,6 +18,7 @@ import { AdminPage } from '@/sections/AdminPage';
 import { DataManagerPage } from '@/sections/DataManagerPage';
 import { GlobalSettingsPage } from '@/sections/GlobalSettingsPage';
 import { BottomNav, PAGE_BREADCRUMBS } from '@/sections/BottomNav';
+import { ScrollToTop } from '@/components/ui/scroll-to-top';
 import { stories } from '@/data/stories';
 import type { Page } from '@/types';
 import './App.css';
@@ -331,6 +332,7 @@ function AppContent() {
           </div>
         </div>
       )}
+      <ScrollToTop />
     </div>
   );
 }

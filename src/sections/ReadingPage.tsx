@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { stories } from '@/data/stories';
 import type { ViewMode, Story, Choice } from '@/types';
+import { useSwipe } from '@/hooks/useSwipe';
+import { useKeyboard } from '@/hooks/useKeyboard';
 
 interface ReadingPageProps {
   storyId: string;
@@ -25,6 +27,8 @@ export function ReadingPage({
   const [volume, setVolume] = useState(50);
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
+  const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!story || story.chapters.length === 0) {
     return (
@@ -51,12 +55,19 @@ export function ReadingPage({
     onProgress(ch.id, ((idx + 1) / story.chapters.length) * 100);
   }, [story, onProgress]);
 
+  const goToChapter = useCallback((idx: number, direction: 'left' | 'right') => {
+    setAnimDirection(direction);
+    setTimeout(() => {
+      setCurrentChapterIndex(idx);
+      saveCurrentProgress(idx);
+      setShowChoices(false);
+      setAnimDirection(null);
+    }, 150);
+  }, [saveCurrentProgress]);
+
   const handleNext = () => {
     if (currentChapterIndex < story.chapters.length - 1) {
-      const next = currentChapterIndex + 1;
-      setCurrentChapterIndex(next);
-      saveCurrentProgress(next);
-      setShowChoices(false);
+      goToChapter(currentChapterIndex + 1, 'left');
     } else {
       onComplete();
     }
@@ -64,10 +75,7 @@ export function ReadingPage({
 
   const handlePrev = () => {
     if (currentChapterIndex > 0) {
-      const prev = currentChapterIndex - 1;
-      setCurrentChapterIndex(prev);
-      saveCurrentProgress(prev);
-      setShowChoices(false);
+      goToChapter(currentChapterIndex - 1, 'right');
     }
   };
 
@@ -76,16 +84,32 @@ export function ReadingPage({
     if (choice.nextChapterId) {
       const targetIdx = story.chapters.findIndex(ch => ch.id === choice.nextChapterId);
       if (targetIdx >= 0) {
-        setCurrentChapterIndex(targetIdx);
-        saveCurrentProgress(targetIdx);
+        goToChapter(targetIdx, 'left');
         return;
       }
     }
     handleNext();
   };
 
+  useSwipe(contentRef, {
+    onSwipeLeft: () => handleNext(),
+    onSwipeRight: () => handlePrev(),
+    onTap: () => setIsPlaying(prev => !prev),
+  }, { threshold: 60, enabled: !showChoices && !showEduMode });
+
+  useKeyboard({
+    enabled: !showChoices && !showEduMode,
+    bindings: [
+      { key: 'ArrowLeft', handler: handlePrev },
+      { key: 'ArrowRight', handler: handleNext },
+      { key: ' ', handler: () => setIsPlaying(prev => !prev), description: '播放/暂停' },
+      { key: 'Escape', handler: onBack, description: '返回' },
+      { key: 'f', handler: () => onComplete(), description: '完成阅读' },
+    ],
+  });
+
   return (
-    <div className="min-h-screen bg-kid-bg flex flex-col">
+    <div className="min-h-screen bg-kid-bg flex flex-col" ref={contentRef}>
       {/* 进度条 */}
       <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-kid-border">
         <div 
@@ -147,8 +171,15 @@ export function ReadingPage({
       </div>
 
       {/* 故事内容 */}
-      <div className="flex-1 px-5 pb-32">
-        <div className="bg-white rounded-kid-lg p-6 shadow-kid">
+      <div className="flex-1 px-5 pb-32 relative overflow-hidden">
+        <div
+          className={`bg-white rounded-kid-lg p-6 shadow-kid transition-all duration-300 ${
+            animDirection === 'left' ? 'animate-slide-out-left' :
+            animDirection === 'right' ? 'animate-slide-out-right' :
+            'animate-fade-in-scale'
+          }`}
+          key={currentChapterIndex}
+        >
           <p className="text-kid-body text-kid-text leading-relaxed">
             {currentChapter.content}
           </p>
