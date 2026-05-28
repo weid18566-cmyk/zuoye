@@ -54,6 +54,16 @@ export interface Favorite {
   addedAt: number;
 }
 
+export interface RecentStory {
+  storyId: string;
+  lastOpenedAt: number;
+}
+
+export interface PageVisit {
+  page: Page;
+  visitedAt: number;
+}
+
 // 视角类型
 export type ViewMode = 'protagonist' | 'supporting' | 'npc';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale } from '@/types';
+import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale, RecentStory, PageVisit } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { safeJsonParse } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ function getStorageKey(userId: string, suffix: string): string {
 }
 
 export function useAppState() {
-  const { user } = useAuth();
+  const { user, currentPage, setCurrentPage } = useAuth();
   const userId = user?.id || 'guest';
 
   // 主题状态
@@ -23,9 +23,6 @@ export function useAppState() {
     const saved = localStorage.getItem(getStorageKey(userId, 'theme'));
     return saved === 'dark' ? 'dark' : 'light';
   });
-
-  // 当前页面
-  const [currentPage, setCurrentPage] = useState<Page>('splash');
 
   // 视图配置
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
@@ -62,6 +59,18 @@ export function useAppState() {
     return Array.isArray(parsed) ? parsed : [];
   });
 
+  const [recentStories, setRecentStories] = useState<RecentStory[]>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'recentStories'));
+    const parsed = safeJsonParse<RecentStory[]>(saved, []);
+    return Array.isArray(parsed) ? parsed : [];
+  });
+
+  const [pageHistory, setPageHistory] = useState<PageVisit[]>(() => {
+    const saved = localStorage.getItem(getStorageKey(userId, 'pageHistory'));
+    const parsed = safeJsonParse<PageVisit[]>(saved, []);
+    return Array.isArray(parsed) ? parsed : [];
+  });
+
   // 当前阅读的故事和视角
   const [currentStoryId, setCurrentStoryId] = useState<string | null>(null);
   const [currentViewMode, setCurrentViewMode] = useState<ViewMode>('protagonist');
@@ -79,6 +88,8 @@ export function useAppState() {
     const savedConfig = localStorage.getItem(getStorageKey(userId, 'config'));
     const savedProgress = localStorage.getItem(getStorageKey(userId, 'progress'));
     const savedFavorites = localStorage.getItem(getStorageKey(userId, 'favorites'));
+    const savedRecentStories = localStorage.getItem(getStorageKey(userId, 'recentStories'));
+    const savedPageHistory = localStorage.getItem(getStorageKey(userId, 'pageHistory'));
 
     setTheme(savedTheme === 'dark' ? 'dark' : 'light');
 
@@ -90,6 +101,12 @@ export function useAppState() {
 
     const parsedFavorites = safeJsonParse<Favorite[]>(savedFavorites, []);
     setFavorites(Array.isArray(parsedFavorites) ? parsedFavorites : []);
+
+    const parsedRecentStories = safeJsonParse<RecentStory[]>(savedRecentStories, []);
+    setRecentStories(Array.isArray(parsedRecentStories) ? parsedRecentStories : []);
+
+    const parsedPageHistory = safeJsonParse<PageVisit[]>(savedPageHistory, []);
+    setPageHistory(Array.isArray(parsedPageHistory) ? parsedPageHistory : []);
   }, [userId]);
 
   // 保存到 localStorage
@@ -110,6 +127,14 @@ export function useAppState() {
   }, [favorites, userId]);
 
   useEffect(() => {
+    localStorage.setItem(getStorageKey(userId, 'recentStories'), JSON.stringify(recentStories));
+  }, [recentStories, userId]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey(userId, 'pageHistory'), JSON.stringify(pageHistory));
+  }, [pageHistory, userId]);
+
+  useEffect(() => {
     localStorage.setItem(getStorageKey(userId, 'layoutMode'), layoutMode);
   }, [layoutMode, userId]);
 
@@ -120,6 +145,15 @@ export function useAppState() {
   useEffect(() => {
     localStorage.setItem(getStorageKey(userId, 'viewScale'), viewScale);
   }, [viewScale, userId]);
+
+  useEffect(() => {
+    setPageHistory((prev) => {
+      const last = prev[0];
+      if (last && last.page === currentPage) return prev;
+      const next: PageVisit = { page: currentPage, visitedAt: Date.now() };
+      return [next, ...prev].slice(0, 50);
+    });
+  }, [currentPage]);
 
   // 切换主题
   const toggleTheme = useCallback(() => {
@@ -172,7 +206,24 @@ export function useAppState() {
     setCurrentStoryId(storyId);
     setCurrentPage('reading');
     setSessionStartTime(Date.now());
-  }, []);
+    setRecentStories((prev) => {
+      const next: RecentStory = { storyId, lastOpenedAt: Date.now() };
+      const filtered = prev.filter((s) => s.storyId !== storyId);
+      return [next, ...filtered].slice(0, 30);
+    });
+  }, [setCurrentPage]);
+
+  const goBack = useCallback(() => {
+    let targetPage: Page | null = null;
+    setPageHistory((prev) => {
+      const next = [...prev];
+      const current = next.shift();
+      const prevNonDup = next.find((p) => p.page !== current?.page);
+      if (prevNonDup) targetPage = prevNonDup.page;
+      return next;
+    });
+    if (targetPage) setCurrentPage(targetPage);
+  }, [setCurrentPage]);
 
   // 检查使用时长
   useEffect(() => {
@@ -195,7 +246,7 @@ export function useAppState() {
     setIsEducationMode(false);
     setSessionStartTime(0);
     setShowTimeLimitModal(false);
-  }, []);
+  }, [setCurrentPage]);
 
   return {
     theme,
@@ -211,6 +262,10 @@ export function useAppState() {
     addFavorite,
     removeFavorite,
     isFavorite,
+    recentStories,
+    setRecentStories,
+    pageHistory,
+    goBack,
     currentStoryId,
     currentViewMode,
     setCurrentViewMode,

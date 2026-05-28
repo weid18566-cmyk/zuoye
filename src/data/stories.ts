@@ -4,9 +4,9 @@ export const categories: Category[] = [
   { id: 'all', name: '全部', icon: 'apps' },
   { id: 'grimm', name: '格林童话', icon: 'forest' },
   { id: 'andersen', name: '安徒生童话', icon: 'waves' },
-  { id: 'chinese', name: '中国传统故事', icon: 'temple' },
-  { id: 'fable', name: '寓言哲理', icon: 'psychology' },
-  { id: 'myth', name: '神话传说', icon: 'auto_awesome' },
+  { id: 'chinese', name: '中国儿童故事集', icon: 'temple' },
+  { id: 'fable', name: '伊索寓言', icon: 'psychology' },
+  { id: 'myth', name: '中国神话传说', icon: 'auto_awesome' },
 ];
 
 export const stories: Story[] = [
@@ -93,7 +93,7 @@ export const stories: Story[] = [
   },
   {
     id: 'magic-brush', title: '神笔马良',
-    cover: '/images/story-magic-brush.jpg', category: 'chinese', categoryName: '中国传统故事',
+    cover: '/images/story-magic-brush.jpg', category: 'chinese', categoryName: '中国儿童故事集',
     ageRange: '6-8岁', minAge: 6, maxAge: 8,
     description: '穷苦少年马良热爱画画，一位白胡子爷爷送了他一支神奇的画笔——画什么都会变成真的！他用这支笔帮助穷人，智斗贪婪的坏官，展现了善良与智慧的力量。',
     characters: [
@@ -110,7 +110,7 @@ export const stories: Story[] = [
   },
   {
     id: 'nezha', title: '哪吒闹海',
-    cover: '/images/story-nezha.jpg', category: 'chinese', categoryName: '中国传统故事',
+    cover: '/images/story-nezha.jpg', category: 'chinese', categoryName: '中国儿童故事集',
     ageRange: '5-7岁', minAge: 5, maxAge: 7,
     description: '小英雄哪吒为保护百姓挺身而出，与东海龙王展开大战。勇敢少年不惧强权，用勇气和担当守护正义！',
     characters: [
@@ -144,7 +144,7 @@ export const stories: Story[] = [
   },
   {
     id: 'tortoise-hare', title: '龟兔赛跑',
-    cover: '/images/story-magic-brush.jpg', category: 'fable', categoryName: '寓言哲理',
+    cover: '/images/story-magic-brush.jpg', category: 'fable', categoryName: '伊索寓言',
     ageRange: '3-5岁', minAge: 3, maxAge: 5,
     description: '骄傲的小白兔看不起慢吞吞的小乌龟，提出比赛跑步。结果会怎样呢？虚心使人进步，骄傲使人落后！',
     characters: [
@@ -198,7 +198,7 @@ export const stories: Story[] = [
   },
   {
     id: 'boy-cried-wolf', title: '狼来了',
-    cover: '/images/story-three-little-pigs.jpg', category: 'fable', categoryName: '寓言哲理',
+    cover: '/images/story-three-little-pigs.jpg', category: 'fable', categoryName: '伊索寓言',
     ageRange: '3-5岁', minAge: 3, maxAge: 5,
     description: '放羊娃为了好玩大喊"狼来了"，村民们赶来却发现被骗了。当狼真的来时，还会有人相信他吗？诚实是做人的根本！',
     characters: [
@@ -216,7 +216,7 @@ export const stories: Story[] = [
   },
   {
     id: 'fox-and-grapes', title: '狐狸和葡萄',
-    cover: '/images/story-magic-brush.jpg', category: 'fable', categoryName: '寓言哲理',
+    cover: '/images/story-magic-brush.jpg', category: 'fable', categoryName: '伊索寓言',
     ageRange: '3-5岁', minAge: 3, maxAge: 5,
     description: '饥饿的狐狸看到架子上挂着一串串晶莹的葡萄，它跳了一次又一次却够不着。最后它说"葡萄是酸的"，骗得了别人却骗不了自己。',
     characters: [
@@ -233,7 +233,7 @@ export const stories: Story[] = [
   },
   {
     id: 'lion-and-mouse', title: '狮子与老鼠',
-    cover: '/images/story-ugly-duckling.jpg', category: 'fable', categoryName: '寓言哲理',
+    cover: '/images/story-ugly-duckling.jpg', category: 'fable', categoryName: '伊索寓言',
     ageRange: '4-6岁', minAge: 4, maxAge: 6,
     description: '强大的狮子放过了弱小的小老鼠，后来小老鼠在狮子危难时救了它。善良不分大小，每个人都能帮助别人！',
     characters: [
@@ -249,7 +249,7 @@ export const stories: Story[] = [
   },
   {
     id: 'change-fly-moon', title: '嫦娥奔月',
-    cover: '/images/story-nezha.jpg', category: 'myth', categoryName: '神话传说',
+    cover: '/images/story-nezha.jpg', category: 'myth', categoryName: '中国神话传说',
     ageRange: '6-8岁', minAge: 6, maxAge: 8,
     description: '美丽的仙女嫦娥为了保护仙丹不被恶人抢走，吞下了仙丹飞向月宫。从此中秋月圆之夜，人们总能看到月亮上那美丽的身影。',
     characters: [
@@ -266,7 +266,7 @@ export const stories: Story[] = [
   },
   {
     id: 'jingwei-fill-sea', title: '精卫填海',
-    cover: '/images/story-magic-brush.jpg', category: 'myth', categoryName: '神话传说',
+    cover: '/images/story-magic-brush.jpg', category: 'myth', categoryName: '中国神话传说',
     ageRange: '6-8岁', minAge: 6, maxAge: 8,
     description: '炎帝的女儿女娃被大海吞没后，化作一只精卫鸟。它每天衔着西山的石子飞往东海，发誓要把大海填平。滴水穿石，志气比天高！',
     characters: [
@@ -297,6 +297,154 @@ export const stories: Story[] = [
       { id: 'thu-ch1', title: '花朵里的生命', illustration: '/images/story-little-red-riding-hood.jpg', content: '从前有一个孤独的女人，她非常想要一个孩子。她去请教一位好心的女巫，女巫给了她一颗大麦粒："种在花盆里，每天浇水，会有惊喜的。"女人照做了。没多久，一株美丽的郁金香破土而出，鲜红的花苞紧紧闭合着。女人轻轻吻了一下花苞——啪！花苞开放了！在鲜嫩的花蕊中央，坐着一个可爱的小姑娘——她只有拇指那么大，所以大家都叫她拇指姑娘。\n\n女人高兴极了，用半个核桃壳给小姑娘做了一张漂亮的小床，用玫瑰花瓣当被子。拇指姑娘每天在桌子的花盆之间玩耍，日子过得幸福极了。', choices: [{ id: 'thu-c1', text: '帮拇指姑娘布置温馨的小屋', icon: 'chair', nextChapterId: 'thu-ch2' }, { id: 'thu-c2', text: '带拇指姑娘去看外面的世界', icon: 'explore', nextChapterId: 'thu-ch2' }] },
       { id: 'thu-ch2', title: '被劫走', illustration: '/images/story-little-red-riding-hood.jpg', content: '一天夜里，一只丑丑的癞蛤蟆从窗户跳进来，看到了沉睡中的拇指姑娘。"做我儿子的新娘再合适不过了！"癞蛤蟆抓起核桃壳床就跳走了。拇指姑娘醒来时，发现自己在一片荷叶上，周围全是水，她害怕地哭了起来。水里的小鱼们听到哭声，咬断了荷叶的茎，让拇指姑娘坐着荷叶漂走了。\n\n拇指姑娘漂啊漂，漂到了岸上。一只金龟子发现了她，把她抓到了树上。可是其他金龟子嘲笑她说"长得好奇怪"，金龟子就把她扔在了菊花丛里。拇指姑娘独自在森林里生活了整整一个夏天和秋天……', choices: [{ id: 'thu-c3', text: '帮拇指姑娘找回家的路', icon: 'near_me', nextChapterId: 'thu-ch3' }, { id: 'thu-c4', text: '带她去田鼠家过冬', icon: 'home', nextChapterId: 'thu-ch3' }] },
       { id: 'thu-ch3', title: '燕子与花王子', illustration: '/images/story-little-red-riding-hood.jpg', content: '冬天来了，拇指姑娘又冷又饿。好心的田鼠太太收留了她，但要求她嫁给邻居鼹鼠先生——一个住在地洞里、从来没见过阳光的富翁。拇指姑娘不愿意，她在地洞里发现了一只冻僵的燕子，便用干草和棉花给燕子做了厚厚的被子，每天照顾它。\n\n春天到了，燕子恢复了健康。"跟我走吧，我带你去看最美的花园！"燕子带着拇指姑娘飞过了森林和湖泊，来到了一个温暖的国度。这里到处都是鲜花，每一朵花里都住着一个小小人！花丛中间站着一朵最大最美的玫瑰，花里坐着一位英俊的花王子——他头戴金色王冠，背后还有一对透明的翅膀。\n\n"你是我见过最美丽的姑娘。"花王子送了她一对翅膀。从此拇指姑娘改名为"花仙子"，和花王子一起，在花的世界里过上了幸福快乐的生活。' },
+    ],
+  },
+  {
+    id: 'hansel-gretel', title: '糖果屋',
+    cover: '/images/story-three-little-pigs.jpg', category: 'grimm', categoryName: '格林童话',
+    ageRange: '5-7岁', minAge: 5, maxAge: 7,
+    description: '汉赛尔和格蕾特在森林里迷路，发现了一座用糖果做成的小屋。甜蜜的外表下藏着什么危险？一个关于机智与团结的故事。',
+    characters: [
+      { id: 'hg-hansel', name: '汉赛尔', avatar: '🧒', type: 'protagonist' },
+      { id: 'hg-gretel', name: '格蕾特', avatar: '👧', type: 'protagonist' },
+      { id: 'hg-witch', name: '糖果屋巫婆', avatar: '🧙', type: 'supporting' },
+      { id: 'hg-bird', name: '森林小鸟', avatar: '🐦', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'hg-ch1', title: '森林迷路', illustration: '/images/story-three-little-pigs.jpg', content: '从前有一对兄妹——汉赛尔和格蕾特。一天，他们跟着大人进森林捡柴，却因为贪玩走得太远，转眼就找不到回家的路了。天色渐暗，树影像一只只大手。格蕾特害怕得快哭了，汉赛尔握紧她的手说："别怕，我们一起想办法。"\n\n就在这时，一只小鸟飞到他们面前，叽叽喳喳地叫着，好像在带路。', choices: [{ id: 'hg-c1', text: '跟着小鸟走', icon: 'near_me', nextChapterId: 'hg-ch2' }, { id: 'hg-c2', text: '先找高处看看方向', icon: 'hiking', nextChapterId: 'hg-ch2' }] },
+      { id: 'hg-ch2', title: '甜蜜的房子', illustration: '/images/story-three-little-pigs.jpg', content: '走着走着，兄妹俩闻到一股香甜的味道。前方竟然出现了一座小屋：墙是饼干做的，屋顶是奶油和糖霜，窗框像巧克力条一样闪亮。\n\n格蕾特忍不住掰下一小块饼干尝了尝："真好吃！"汉赛尔也咬了一口糖霜，甜得眯起眼。可是妈妈常说：太容易得到的东西，往往不简单。', choices: [{ id: 'hg-c3', text: '只吃一点点就走', icon: 'directions_run', nextChapterId: 'hg-ch3' }, { id: 'hg-c4', text: '敲门问问屋主', icon: 'door_front', nextChapterId: 'hg-ch3' }] },
+      { id: 'hg-ch3', title: '巫婆的邀请', illustration: '/images/story-three-little-pigs.jpg', content: '门吱呀一声打开，一个笑眯眯的老婆婆探出头来："哎呀，两位小宝贝，饿坏了吧？快进来，我给你们烤蛋糕、热牛奶。"\n\n屋里暖和又香甜，桌上摆满点心。可汉赛尔总觉得老婆婆的眼神像在数糖果一样在数他们。格蕾特悄悄拉了拉哥哥的袖子。', choices: [{ id: 'hg-c5', text: '保持警惕，悄悄观察', icon: 'visibility', nextChapterId: 'hg-ch4' }, { id: 'hg-c6', text: '相信老婆婆，先吃饱', icon: 'restaurant', nextChapterId: 'hg-ch4' }] },
+      { id: 'hg-ch4', title: '机智逃脱', illustration: '/images/story-three-little-pigs.jpg', content: '原来老婆婆是个坏巫婆，她想把孩子关起来。汉赛尔被关进小笼子，格蕾特被逼着干活。巫婆每天都要摸汉赛尔的手指，想看他是不是变胖了。\n\n汉赛尔灵机一动，把一根小骨头伸出去让巫婆摸——巫婆以为他还很瘦，便拖延了好些天。\n\n终于有一天，巫婆急了，命令格蕾特去点火烤炉子。格蕾特装作不会用，骗巫婆靠近查看——然后她鼓起勇气把巫婆推了进去，赶紧关上炉门。兄妹俩救回了彼此，带上巫婆屋里的面包和宝石，沿着小鸟带来的小路回到家。\n\n他们明白了：遇到困难时，聪明和团结比害怕更有力量。' },
+    ],
+  },
+  {
+    id: 'frog-prince', title: '青蛙王子',
+    cover: '/images/story-snow-white.jpg', category: 'grimm', categoryName: '格林童话',
+    ageRange: '4-6岁', minAge: 4, maxAge: 6,
+    description: '公主在井边丢了金球，遇到一只青蛙。她会遵守承诺吗？一个关于诚信与勇气的童话。',
+    characters: [
+      { id: 'fp-princess', name: '小公主', avatar: '👸', type: 'protagonist' },
+      { id: 'fp-frog', name: '小青蛙', avatar: '🐸', type: 'supporting' },
+      { id: 'fp-king', name: '国王爸爸', avatar: '👑', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'fp-ch1', title: '掉进井里的金球', illustration: '/images/story-snow-white.jpg', content: '小公主最喜欢她的金球。一天她在井边玩，金球不小心滑进了深井里。公主急得直跺脚，眼泪都快掉下来了。\n\n这时，一只小青蛙从水里冒出头："公主别哭，我能把球捞上来，但你要答应我一个请求。"', choices: [{ id: 'fp-c1', text: '答应青蛙的请求', icon: 'handshake', nextChapterId: 'fp-ch2' }, { id: 'fp-c2', text: '先问清楚是什么请求', icon: 'help', nextChapterId: 'fp-ch2' }] },
+      { id: 'fp-ch2', title: '承诺与考验', illustration: '/images/story-snow-white.jpg', content: '青蛙说："我不要金银，只想和你做朋友：一起吃饭、一起散步、晚上住在你的城堡里。"\n\n公主心想：一只青蛙怎么可能真的进城堡呢？她随口答应了。青蛙把金球顶上来，公主抱着金球就跑了。\n\n晚上，城堡门口传来敲门声——咚咚咚！青蛙真的来了。', choices: [{ id: 'fp-c3', text: '悄悄躲起来', icon: 'hide_source', nextChapterId: 'fp-ch3' }, { id: 'fp-c4', text: '鼓起勇气开门', icon: 'door_open', nextChapterId: 'fp-ch3' }] },
+      { id: 'fp-ch3', title: '诚信的力量', illustration: '/images/story-snow-white.jpg', content: '国王爸爸听完经过，认真地说："答应了别人，就要做到。诚信是最珍贵的。"\n\n公主红着脸把青蛙请进来。青蛙没有捣乱，只是安静地吃饭、讲故事。公主发现它其实很有礼貌。\n\n当公主终于愿意把青蛙当朋友时，奇妙的事情发生了——青蛙变成了一位被魔法变成青蛙的王子！王子感谢公主守信，也感谢她的善良。从此公主明白了：一个承诺，比一颗金球更闪亮。' },
+    ],
+  },
+  {
+    id: 'little-mermaid', title: '海的女儿',
+    cover: '/images/story-ugly-duckling.jpg', category: 'andersen', categoryName: '安徒生童话',
+    ageRange: '6-8岁', minAge: 6, maxAge: 8,
+    description: '小美人鱼向往陆地的世界，经历艰难选择。她学会了勇敢与善良，也懂得了爱与成长的意义。',
+    characters: [
+      { id: 'lm-mermaid', name: '小美人鱼', avatar: '🧜‍♀️', type: 'protagonist' },
+      { id: 'lm-prince', name: '王子', avatar: '🤴', type: 'supporting' },
+      { id: 'lm-sea-witch', name: '海巫婆', avatar: '🧙‍♀️', type: 'npc' },
+      { id: 'lm-sisters', name: '姐姐们', avatar: '🧜‍♀️', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'mer-ch1', title: '向往陆地', illustration: '/images/story-ugly-duckling.jpg', content: '在深蓝色的海里，小美人鱼常常听海浪讲陆地的故事：有会开花的树、有会唱歌的鸟，还有夜晚闪闪发光的星星。她总想亲眼看看。\n\n终于到了可以浮上海面的那一天，她悄悄游上去，看到一艘大船和盛大的灯火。', choices: [{ id: 'mer-c1', text: '躲在礁石后观察', icon: 'visibility', nextChapterId: 'mer-ch2' }, { id: 'mer-c2', text: '更靠近一点看看船', icon: 'sailing', nextChapterId: 'mer-ch2' }] },
+      { id: 'mer-ch2', title: '风暴中的救援', illustration: '/images/story-ugly-duckling.jpg', content: '突然风暴来临，大船摇晃，王子落入海中。小美人鱼不顾危险，把王子托到岸边，躲在远处看着人们把他救醒。\n\n她心里又开心又难过：开心是因为王子平安，难过是因为她无法和王子说话。', choices: [{ id: 'mer-c3', text: '回到海里告诉姐姐们', icon: 'forum', nextChapterId: 'mer-ch3' }, { id: 'mer-c4', text: '继续守护王子一会儿', icon: 'favorite', nextChapterId: 'mer-ch3' }] },
+      { id: 'mer-ch3', title: '艰难的选择', illustration: '/images/story-ugly-duckling.jpg', content: '小美人鱼想靠近王子，便去找海巫婆。海巫婆说："我能让你长出双腿，但你会失去声音。每走一步都像踩在尖刺上。你愿意吗？"\n\n小美人鱼握紧手心，想起王子温暖的笑，深深点头。', choices: [{ id: 'mer-c5', text: '勇敢接受考验', icon: 'emoji_events', nextChapterId: 'mer-ch4' }, { id: 'mer-c6', text: '再想想，先回家', icon: 'home', nextChapterId: 'mer-ch4' }] },
+      { id: 'mer-ch4', title: '成长的礼物', illustration: '/images/story-ugly-duckling.jpg', content: '小美人鱼来到陆地，虽然不能说话，但她学会了用眼神和行动表达善意。她帮助受伤的小动物，照顾迷路的孩子。\n\n王子也被她的善良打动，明白真正珍贵的不是声音和外表，而是心。\n\n小美人鱼懂得：爱不是占有，而是希望对方快乐；成长不是得到一切，而是学会做正确的选择。' },
+    ],
+  },
+  {
+    id: 'princess-pea', title: '豌豆公主',
+    cover: '/images/story-snow-white.jpg', category: 'andersen', categoryName: '安徒生童话',
+    ageRange: '4-6岁', minAge: 4, maxAge: 6,
+    description: '暴风雨的夜晚，一位自称公主的女孩来到城堡。她真的是真公主吗？一个有趣又温柔的故事。',
+    characters: [
+      { id: 'pp-princess', name: '公主', avatar: '👸', type: 'protagonist' },
+      { id: 'pp-queen', name: '王后', avatar: '👑', type: 'supporting' },
+      { id: 'pp-prince', name: '王子', avatar: '🤴', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'pp-ch1', title: '雨夜来客', illustration: '/images/story-snow-white.jpg', content: '一个雷雨交加的夜晚，城堡门口传来敲门声。门外站着一位浑身湿透的女孩，她说自己是公主。\n\n王子很惊讶，可王后想要确认真相。' },
+      { id: 'pp-ch2', title: '豌豆的试验', illustration: '/images/story-snow-white.jpg', content: '王后悄悄在床垫下面放了一颗豌豆，然后在上面叠了好多好多层床垫和羽绒被。\n\n女孩睡了一夜。第二天，她揉着眼睛说："我一晚上都没睡好，背上好像硌着什么东西！"王后笑了：只有真正娇嫩的公主，才会感觉到那颗小小的豌豆。', choices: [{ id: 'pp-c1', text: '夸夸公主的勇敢', icon: 'favorite', nextChapterId: 'pp-ch3' }, { id: 'pp-c2', text: '告诉大家要尊重每个人', icon: 'handshake', nextChapterId: 'pp-ch3' }] },
+      { id: 'pp-ch3', title: '温柔的结尾', illustration: '/images/story-snow-white.jpg', content: '王子开心极了，他终于遇到真正的公主。大家为她准备了干净的衣服和热热的汤。\n\n公主也明白：无论身份如何，善良和真诚才让人被看见。' },
+    ],
+  },
+  {
+    id: 'simaguang-break-jar', title: '司马光砸缸',
+    cover: '/images/story-magic-brush.jpg', category: 'chinese', categoryName: '中国儿童故事集',
+    ageRange: '4-6岁', minAge: 4, maxAge: 6,
+    description: '小伙伴不小心掉进大水缸，危急时刻司马光冷静思考，用石头砸破水缸救人。遇到危险要冷静、要想办法！',
+    characters: [
+      { id: 'sg-simaguang', name: '司马光', avatar: '🧒', type: 'protagonist' },
+      { id: 'sg-kid', name: '小伙伴', avatar: '👦', type: 'supporting' },
+      { id: 'sg-friends', name: '同伴们', avatar: '👧', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'sg-ch1', title: '院子里玩耍', illustration: '/images/story-magic-brush.jpg', content: '一群小伙伴在院子里玩捉迷藏。角落里有一个大水缸，装满了水。\n\n大家跑来跑去，笑声不断。' },
+      { id: 'sg-ch2', title: '意外发生', illustration: '/images/story-magic-brush.jpg', content: '突然，一个小伙伴脚下一滑，掉进了水缸里！他拼命扑腾，水花四溅。\n\n孩子们吓坏了，有的哭、有的乱跑去找大人。司马光也很着急，但他深吸一口气，努力让自己冷静下来。', choices: [{ id: 'sg-c1', text: '立刻去喊大人', icon: 'campaign', nextChapterId: 'sg-ch3' }, { id: 'sg-c2', text: '就地想办法救人', icon: 'psychology', nextChapterId: 'sg-ch3' }] },
+      { id: 'sg-ch3', title: '冷静救人', illustration: '/images/story-magic-brush.jpg', content: '司马光看见院子里有几块大石头，立刻搬起一块，朝水缸砸去——咚！水缸裂开了。再砸一下——咔嚓！水缸破了，水哗啦啦流出来，小伙伴也被水冲到缸外。\n\n大家赶紧把他扶起来，终于脱离危险。司马光说："遇到危险，最重要的是冷静，想出办法。"\n\n从此孩子们都记住了：危急时刻不乱跑，先让自己镇定，再寻找能救人的方法。' },
+    ],
+  },
+  {
+    id: 'kongrong-share-pears', title: '孔融让梨',
+    cover: '/images/story-magic-brush.jpg', category: 'chinese', categoryName: '中国儿童故事集',
+    ageRange: '3-5岁', minAge: 3, maxAge: 5,
+    description: '家里分梨时，小孔融把大的留给哥哥，把小的留给自己。礼让与体贴，让一家人更温暖。',
+    characters: [
+      { id: 'kr-kongrong', name: '孔融', avatar: '🧒', type: 'protagonist' },
+      { id: 'kr-brother', name: '哥哥', avatar: '👦', type: 'supporting' },
+      { id: 'kr-parent', name: '父母', avatar: '👨‍👩‍👧‍👦', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'kr-ch1', title: '香甜的梨', illustration: '/images/story-magic-brush.jpg', content: '一天，家里买来一篮子香甜的梨。梨有大有小，圆圆的，闻起来甜甜的。\n\n父母把孩子们叫来："大家一起分梨吧！"' },
+      { id: 'kr-ch2', title: '把大的让给别人', illustration: '/images/story-magic-brush.jpg', content: '哥哥们都想挑最大的梨。小孔融想了想，拿起最小的那一个。\n\n大家都很惊讶："你为什么拿小的？"\n\n孔融认真地说："大的让给哥哥们吃，哥哥们长得高，要多吃一点。我吃小的也很甜呀。"', choices: [{ id: 'kr-c1', text: '夸孔融懂得分享', icon: 'favorite', nextChapterId: 'kr-ch3' }, { id: 'kr-c2', text: '提醒大家轮流选择', icon: 'sync', nextChapterId: 'kr-ch3' }] },
+      { id: 'kr-ch3', title: '温暖的家', illustration: '/images/story-magic-brush.jpg', content: '父母笑着点点头，哥哥们也有点不好意思，纷纷说："那我也拿一个中等的吧。"\n\n一家人围在一起吃梨，甜甜的味道像阳光一样。\n\n他们明白：分享不是吃亏，而是让大家都更开心。' },
+    ],
+  },
+  {
+    id: 'ant-and-grasshopper', title: '蚂蚁和蚱蜢',
+    cover: '/images/story-three-little-pigs.jpg', category: 'fable', categoryName: '伊索寓言',
+    ageRange: '3-5岁', minAge: 3, maxAge: 5,
+    description: '夏天蚂蚁忙着搬粮食，蚱蜢只顾唱歌。冬天来临时，谁会更安心？努力与规划让生活更踏实。',
+    characters: [
+      { id: 'ag-ant', name: '小蚂蚁', avatar: '🐜', type: 'protagonist' },
+      { id: 'ag-grass', name: '小蚱蜢', avatar: '🦗', type: 'protagonist' },
+      { id: 'ag-bugs', name: '昆虫朋友们', avatar: '🐞', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'ag-ch1', title: '夏天的歌声', illustration: '/images/story-three-little-pigs.jpg', content: '夏天阳光灿烂，小蚱蜢坐在草叶上唱歌，跳来跳去。\n\n小蚂蚁却忙得满头大汗，一粒一粒把粮食搬回洞里。蚱蜢笑着说："别搬啦，来唱歌玩吧！"' , choices: [{ id: 'ag-c1', text: '劝蚱蜢也准备粮食', icon: 'inventory', nextChapterId: 'ag-ch2' }, { id: 'ag-c2', text: '陪蚱蜢唱一会儿再干活', icon: 'music_note', nextChapterId: 'ag-ch2' }] },
+      { id: 'ag-ch2', title: '冬天来了', illustration: '/images/story-three-little-pigs.jpg', content: '秋风一吹，叶子变黄。冬天很快来了，雪花落在洞口。\n\n小蚂蚁在洞里吃着储备的粮食，心里踏实。小蚱蜢却饿得发抖，只能敲开蚂蚁的门。', choices: [{ id: 'ag-c3', text: '让蚱蜢一起劳动换食物', icon: 'handyman', nextChapterId: 'ag-ch3' }, { id: 'ag-c4', text: '先给一点食物救急', icon: 'volunteer_activism', nextChapterId: 'ag-ch3' }] },
+      { id: 'ag-ch3', title: '努力与分享', illustration: '/images/story-three-little-pigs.jpg', content: '小蚂蚁说："我可以帮你，但你也要学会准备。我们一起把洞里整理好，你帮忙搬树叶当被子。"\n\n小蚱蜢点点头，开始认真劳动。冬天虽然冷，但它们一起努力，洞里变得暖和。\n\n这个故事告诉我们：努力和规划能保护自己；而善良的分享，会让朋友一起变得更好。' },
+    ],
+  },
+  {
+    id: 'crow-and-fox', title: '乌鸦和狐狸',
+    cover: '/images/story-magic-brush.jpg', category: 'fable', categoryName: '伊索寓言',
+    ageRange: '3-5岁', minAge: 3, maxAge: 5,
+    description: '乌鸦叼着奶酪站在树上，狐狸用甜言蜜语夸它唱得好。乌鸦会怎么做？学会分辨夸奖与陷阱。',
+    characters: [
+      { id: 'cf-crow', name: '乌鸦', avatar: '🐦‍⬛', type: 'protagonist' },
+      { id: 'cf-fox', name: '狐狸', avatar: '🦊', type: 'supporting' },
+    ],
+    chapters: [
+      { id: 'cf-ch1', title: '树上的奶酪', illustration: '/images/story-magic-brush.jpg', content: '乌鸦找到一块香喷喷的奶酪，叼在嘴里站到树枝上。它心里美滋滋的。\n\n狐狸闻到香味，眼睛一亮，慢慢走到树下。' },
+      { id: 'cf-ch2', title: '甜言蜜语', illustration: '/images/story-magic-brush.jpg', content: '狐狸抬头笑眯眯地说："乌鸦姐姐，你的羽毛真漂亮！你一定是森林里最会唱歌的。能给我听一段吗？"\n\n乌鸦听了很得意，差点就张嘴唱歌——可奶酪也在嘴里呢。', choices: [{ id: 'cf-c1', text: '保持沉默不张嘴', icon: 'volume_off', nextChapterId: 'cf-ch3' }, { id: 'cf-c2', text: '开心地唱一段', icon: 'music_note', nextChapterId: 'cf-ch3a' }] },
+      { id: 'cf-ch3', title: '学会判断', illustration: '/images/story-magic-brush.jpg', content: '乌鸦想到：如果我张嘴，奶酪就会掉下去。它没有理狐狸，而是叼着奶酪飞走了。\n\n狐狸只能望着树枝叹气。\n\n这个故事告诉我们：听到夸奖别急着得意，先想一想对方是不是另有目的。' },
+      { id: 'cf-ch3a', title: '奶酪掉下去了', illustration: '/images/story-magic-brush.jpg', content: '乌鸦张嘴一唱："哇——"奶酪啪嗒一声掉了下去。\n\n狐狸立刻叼起奶酪跑了，还回头说："谢谢你的奶酪！记住：爱听奉承的人，最容易吃亏。"\n\n乌鸦又羞又气，从此学会了：夸奖不一定都是好意，做决定前先动脑子。' },
+    ],
+  },
+  {
+    id: 'kuafu-chase-sun', title: '夸父追日',
+    cover: '/images/story-nezha.jpg', category: 'myth', categoryName: '中国神话传说',
+    ageRange: '6-8岁', minAge: 6, maxAge: 8,
+    description: '夸父为了给人间带来光明和凉爽，决心追赶太阳。他的坚持与担当，成为千古传颂的勇气象征。',
+    characters: [
+      { id: 'kf-kuafu', name: '夸父', avatar: '🗻', type: 'protagonist' },
+      { id: 'kf-sun', name: '太阳', avatar: '☀️', type: 'supporting' },
+      { id: 'kf-tribe', name: '族人们', avatar: '👨‍👩‍👧‍👦', type: 'npc' },
+    ],
+    chapters: [
+      { id: 'kf-ch1', title: '炎热的世界', illustration: '/images/story-nezha.jpg', content: '上古时候，太阳炙烤大地，河流变浅，草木枯黄。族人们在烈日下劳作，非常辛苦。\n\n巨人夸父看在眼里，心里很难受。他说："我要追上太阳，让它慢一点走，让大家有喘息的时间。"' },
+      { id: 'kf-ch2', title: '追赶太阳', illustration: '/images/story-nezha.jpg', content: '夸父迈开大步追着太阳跑。山川在他脚下飞快后退，风在他耳边呼啸。\n\n跑着跑着，他口渴得像火烧一样，便一口喝干了黄河、又喝干了渭河，可还是觉得不够。', choices: [{ id: 'kf-c1', text: '继续追赶不放弃', icon: 'directions_run', nextChapterId: 'kf-ch3' }, { id: 'kf-c2', text: '停下来休息想办法', icon: 'psychology', nextChapterId: 'kf-ch3' }] },
+      { id: 'kf-ch3', title: '留下的礼物', illustration: '/images/story-nezha.jpg', content: '夸父最终倒在追日的路上。但他没有白白付出——他把手杖插进大地，手杖变成了一片桃林；他倒下的地方也形成了新的河流。\n\n桃林为行人遮阴，河流为人们解渴。\n\n人们说：勇敢不只是赢得胜利，更是在努力中留下对别人有用的礼物。夸父的精神，像太阳一样照亮后人。' },
     ],
   },
 ];

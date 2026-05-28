@@ -99,13 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (account: string, password: string) => {
       let user: User | null = null;
 
-      if (validateEmail(account)) {
-        user = await getUserByEmail(account);
-      } else if (validatePhone(account)) {
-        user = await getUserByPhone(account);
-      } else {
-        user = await getUserByUsername(account);
-      }
+      user = await getUserByUsername(account);
+      if (!user) user = await getUserByEmail(account);
+      if (!user) user = await getUserByPhone(account);
 
       if (!user) {
         return { success: false, message: '账号不存在' };
@@ -128,24 +124,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = generateToken();
       saveSession(user, token);
       setState({ user, token, isAuthenticated: true, isLoading: false });
+      setCurrentPage('library');
       return { success: true, message: '登录成功' };
     },
-    [saveSession]
+    [saveSession, setCurrentPage]
   );
 
   const register = useCallback(
     async (username: string, email: string, phone: string, password: string, role: UserRole) => {
-      if (!validateUsername(username)) {
-        return { success: false, message: '用户名格式不正确（2-20位字母、数字、中文、下划线）' };
-      }
-      if (!validateEmail(email)) {
-        return { success: false, message: '邮箱格式不正确' };
-      }
-      if (!validatePhone(phone)) {
-        return { success: false, message: '手机号格式不正确' };
-      }
-      if (!validatePassword(password)) {
-        return { success: false, message: '密码长度应为6-32位' };
+      if (!username.trim() || !email.trim() || !phone.trim() || !password) {
+        return { success: false, message: '请填写完整信息' };
       }
 
       const existingUser = await getUserByUsername(username);
@@ -183,9 +171,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = generateToken();
       saveSession(user, token);
       setState({ user, token, isAuthenticated: true, isLoading: false });
+      setCurrentPage('library');
       return { success: true, message: '注册成功' };
     },
-    [saveSession]
+    [saveSession, setCurrentPage]
   );
 
   const logout = useCallback(() => {

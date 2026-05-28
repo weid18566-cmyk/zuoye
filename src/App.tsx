@@ -40,7 +40,7 @@ function Breadcrumb({ currentPage, onNavigate }: { currentPage: string; onNaviga
           <>
             <span className="material-symbols-rounded text-xs">chevron_right</span>
             <button
-              onClick={() => parent.page && onNavigate(parent.page)}
+              onClick={() => info.parent && onNavigate(info.parent)}
               className="hover:text-kid-primary transition-colors"
             >
               {parent.label}
@@ -58,8 +58,8 @@ function AppContent() {
   const {
     theme,
     toggleTheme,
-    currentPage: appPage,
-    setCurrentPage: setAppPage,
+    currentPage,
+    setCurrentPage,
     aiConfig,
     updateAIConfig,
     readingProgress,
@@ -68,6 +68,10 @@ function AppContent() {
     addFavorite,
     removeFavorite,
     isFavorite,
+    recentStories,
+    setRecentStories,
+    pageHistory,
+    goBack,
     currentStoryId,
     currentViewMode,
     setCurrentViewMode,
@@ -83,7 +87,7 @@ function AppContent() {
     setViewScale,
   } = useAppState();
 
-  const { isAuthenticated, isLoading, setCurrentPage: setAuthPage, currentPage: authPage, hasPermission } = useAuth();
+  const { isAuthenticated, isLoading, hasPermission } = useAuth();
   const { addToast } = useToast();
   const {
     showOnboarding,
@@ -94,16 +98,24 @@ function AppContent() {
     completeOnboarding,
   } = useOnboarding();
 
-  const currentPage = (() => {
-    if (isLoading) return 'splash';
-    if (authPage !== 'splash') return authPage;
-    return appPage;
-  })();
+  const page = isLoading ? 'splash' : currentPage;
 
-  const handleSetPage = (page: Page) => {
-    setAppPage(page);
-    setAuthPage(page);
+  const handleSetPage = (next: Page) => {
+    setCurrentPage(next);
   };
+
+  useEffect(() => {
+    if (isLoading) return;
+    const authPages: Page[] = ['login', 'register', 'forgotPassword', 'splash'];
+    const isAuthPage = authPages.includes(currentPage);
+    if (!isAuthenticated && !isAuthPage) {
+      setCurrentPage('login');
+      return;
+    }
+    if (isAuthenticated && isAuthPage && currentPage !== 'splash') {
+      setCurrentPage('library');
+    }
+  }, [isAuthenticated, isLoading, currentPage, setCurrentPage]);
 
   const handleEnterFromSplash = () => {
     handleSetPage(isAuthenticated ? 'library' : 'login');
@@ -152,14 +164,13 @@ function AppContent() {
 
   // 修复：用 useEffect 处理 reading 页面无 storyId 的导航
   useEffect(() => {
-    if (currentPage === 'reading' && !currentStoryId) {
-      setAppPage('library');
-      setAuthPage('library');
+    if (page === 'reading' && !currentStoryId) {
+      setCurrentPage('library');
     }
-  }, [currentPage, currentStoryId, setAppPage, setAuthPage]);
+  }, [page, currentStoryId, setCurrentPage]);
 
   const renderPage = () => {
-    switch (currentPage) {
+    switch (page) {
       case 'splash':
         return <SplashScreen onEnter={handleEnterFromSplash} />;
 
@@ -173,7 +184,17 @@ function AppContent() {
         return <ForgotPasswordPage />;
 
       case 'profile':
-        return <ProfilePage />;
+        return (
+          <ProfilePage
+            favoritesCount={favorites.length}
+            readingCount={readingProgress.length}
+            recentStories={recentStories}
+            pageHistory={pageHistory}
+            onNavigate={handleSetPage}
+            onGoBack={goBack}
+            onStartReading={handleSelectStory}
+          />
+        );
 
       case 'admin':
         return <AdminPage />;
@@ -232,6 +253,8 @@ function AppContent() {
             readingProgress={readingProgress}
             onSelectStory={handleSelectStory}
             onRemoveFavorite={removeFavorite}
+            recentStories={recentStories}
+            onClearHistory={() => setRecentStories([])}
             onBack={() => handleSetPage('library')}
           />
         );
@@ -241,25 +264,24 @@ function AppContent() {
     }
   };
 
-  const showBottomNav = !['splash', 'reading', 'settings', 'login', 'register', 'forgotPassword', 'admin', 'dataManager', 'globalSettings', 'profile'].includes(currentPage);
-  const showBottomNavAuth = isAuthenticated && showBottomNav;
+  const showBottomNav = isAuthenticated && !['splash', 'login', 'register', 'forgotPassword', 'reading'].includes(page);
 
   return (
     <div className={`app ${theme}`}>
       <main className="min-h-screen">
-        <PageTransition pageKey={currentPage}>
+        <PageTransition pageKey={page}>
           {renderPage()}
         </PageTransition>
       </main>
 
       <Breadcrumb
-        currentPage={currentPage}
+        currentPage={page}
         onNavigate={handleSetPage}
       />
 
-      {showBottomNavAuth && (
+      {showBottomNav && (
         <BottomNav
-          currentPage={currentPage}
+          currentPage={page}
           onPageChange={handleSetPage}
           favoriteCount={favorites.length}
           readingStoryId={currentStoryId}
@@ -270,7 +292,7 @@ function AppContent() {
       )}
 
       {/* 新手引导 */}
-      {showOnboarding && isAuthenticated && currentPage === 'library' && (
+      {showOnboarding && isAuthenticated && page === 'library' && (
         <GuideOverlay
           show={showOnboarding}
           onClose={completeOnboarding}

@@ -120,8 +120,10 @@ export function SplashScreen({ onEnter }: SplashScreenProps) {
           onClick={handleEnter}
           onMouseDown={() => setButtonPressed(true)}
           onMouseUp={() => setButtonPressed(false)}
+          onMouseLeave={() => setButtonPressed(false)}
           onTouchStart={() => setButtonPressed(true)}
           onTouchEnd={() => setButtonPressed(false)}
+          onTouchCancel={() => setButtonPressed(false)}
           className={`btn-primary min-w-[200px] touch-ripple transition-all duration-600 ${
             titleIndex >= titleText.length ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
           } ${buttonPressed ? 'scale-95' : titleIndex >= titleText.length ? 'animate-pulse-soft' : ''}`}

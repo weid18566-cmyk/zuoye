@@ -1,9 +1,30 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveLocalBackup, restoreLocalBackup, hasLocalBackup } from '@/lib/backup';
+import { stories } from '@/data/stories';
+import { PAGE_BREADCRUMBS } from '@/sections/BottomNav';
+import type { Page, PageVisit, RecentStory } from '@/types';
 
-export function ProfilePage() {
-  const { user, logout, setCurrentPage, hasPermission, updateUserProfile } = useAuth();
+interface ProfilePageProps {
+  favoritesCount: number;
+  readingCount: number;
+  recentStories: RecentStory[];
+  pageHistory: PageVisit[];
+  onNavigate: (page: Page) => void;
+  onGoBack: () => void;
+  onStartReading: (storyId: string) => void;
+}
+
+export function ProfilePage({
+  favoritesCount,
+  readingCount,
+  recentStories,
+  pageHistory,
+  onNavigate,
+  onGoBack,
+  onStartReading,
+}: ProfilePageProps) {
+  const { user, logout, hasPermission, updateUserProfile } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [username, setUsername] = useState(user?.username || '');
@@ -36,6 +57,27 @@ export function ProfilePage() {
 
   if (!user) return null;
 
+  const recentStoryCards = recentStories
+    .map((r) => {
+      const story = stories.find((s) => s.id === r.storyId);
+      return story ? { story, lastOpenedAt: r.lastOpenedAt } : null;
+    })
+    .filter((x): x is { story: (typeof stories)[number]; lastOpenedAt: number } => !!x)
+    .slice(0, 3);
+
+  const historyPages = (() => {
+    const seen = new Set<string>();
+    const result: Page[] = [];
+    for (const item of pageHistory) {
+      if (['splash', 'login', 'register', 'forgotPassword', 'reading'].includes(item.page)) continue;
+      if (seen.has(item.page)) continue;
+      seen.add(item.page);
+      result.push(item.page);
+      if (result.length >= 5) break;
+    }
+    return result;
+  })();
+
   return (
     <div className="min-h-screen bg-kid-bg pb-24">
       <div className="absolute top-0 left-0 right-0 h-40 gradient-top pointer-events-none" />
@@ -43,7 +85,7 @@ export function ProfilePage() {
       <header className="relative z-10 px-5 pt-12 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentPage('library')} className="btn-icon">
+            <button onClick={() => (pageHistory.length > 1 ? onGoBack() : onNavigate('library'))} className="btn-icon">
               <span className="material-symbols-rounded text-kid-primary">arrow_back</span>
             </button>
             <h1 className="font-title text-kid-lg text-kid-text">个人中心</h1>
@@ -104,11 +146,114 @@ export function ProfilePage() {
           )}
         </section>
 
+        <section className="bg-white rounded-kid-lg p-6 shadow-kid">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-title text-kid-md text-kid-text">概览</h2>
+            <button onClick={() => onNavigate('collection')} className="text-kid-xs text-kid-primary hover:underline">
+              打开书架
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={() => onNavigate('collection')} className="p-4 rounded-kid-lg bg-kid-primary/5 text-left">
+              <p className="text-kid-xs text-kid-text/60">收藏</p>
+              <p className="font-title text-kid-lg text-kid-text mt-1">{favoritesCount}</p>
+            </button>
+            <button onClick={() => onNavigate('collection')} className="p-4 rounded-kid-lg bg-kid-secondary/20 text-left">
+              <p className="text-kid-xs text-kid-text/60">阅读进度</p>
+              <p className="font-title text-kid-lg text-kid-text mt-1">{readingCount}</p>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <button onClick={() => onNavigate('library')} className="btn-secondary">
+              <span className="material-symbols-rounded">menu_book</span>
+              <span>去童话库</span>
+            </button>
+            <button onClick={() => onNavigate('settings')} className="btn-secondary">
+              <span className="material-symbols-rounded">settings</span>
+              <span>应用设置</span>
+            </button>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-kid-lg p-6 shadow-kid">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-title text-kid-md text-kid-text">最近阅读</h2>
+            <button onClick={() => onNavigate('collection')} className="text-kid-xs text-kid-primary hover:underline">
+              查看更多
+            </button>
+          </div>
+
+          {recentStoryCards.length === 0 ? (
+            <div className="text-center py-6 text-kid-text/50">
+              <span className="material-symbols-rounded text-4xl mb-2 block">history</span>
+              <p className="text-kid-sm">还没有阅读记录</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentStoryCards.map(({ story, lastOpenedAt }) => (
+                <button
+                  key={story.id}
+                  onClick={() => onStartReading(story.id)}
+                  className="w-full flex items-center gap-3 p-3 rounded-kid-lg bg-kid-border/20 hover:bg-kid-primary/10 transition-colors text-left"
+                >
+                  <div className="w-12 h-12 rounded-kid-md overflow-hidden flex-shrink-0">
+                    <img src={story.cover} alt={story.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-kid-sm font-medium text-kid-text truncate">{story.title}</p>
+                    <p className="text-kid-xs text-kid-text/60 mt-0.5">
+                      {story.categoryName} · {new Date(lastOpenedAt).toLocaleString('zh-CN')}
+                    </p>
+                  </div>
+                  <span className="material-symbols-rounded text-kid-primary">play_circle</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="bg-white rounded-kid-lg p-6 shadow-kid">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-title text-kid-md text-kid-text">最近访问</h2>
+            <button onClick={() => onNavigate('library')} className="text-kid-xs text-kid-primary hover:underline">
+              回到首页
+            </button>
+          </div>
+
+          {historyPages.length === 0 ? (
+            <div className="text-center py-6 text-kid-text/50">
+              <span className="material-symbols-rounded text-4xl mb-2 block">route</span>
+              <p className="text-kid-sm">暂无访问记录</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {historyPages.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => onNavigate(p)}
+                  className="p-4 rounded-kid-lg bg-kid-border/20 hover:bg-kid-primary/10 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-rounded text-kid-primary">
+                      {PAGE_BREADCRUMBS[p]?.icon || 'link'}
+                    </span>
+                    <span className="text-kid-sm font-medium text-kid-text">
+                      {PAGE_BREADCRUMBS[p]?.label || p}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
         {/* 功能菜单 */}
         <section className="bg-white rounded-kid-lg shadow-kid overflow-hidden">
           {/* 全局设置 */}
           <button
-            onClick={() => setCurrentPage('globalSettings')}
+            onClick={() => onNavigate('globalSettings')}
             className="w-full flex items-center gap-4 px-6 py-5 hover:bg-kid-border/20 transition-colors border-b border-kid-border"
           >
             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
@@ -124,7 +269,7 @@ export function ProfilePage() {
           {/* 数据管理 */}
           {hasPermission('canManageData') && (
             <button
-              onClick={() => setCurrentPage('dataManager')}
+              onClick={() => onNavigate('dataManager')}
               className="w-full flex items-center gap-4 px-6 py-5 hover:bg-kid-border/20 transition-colors border-b border-kid-border"
             >
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -141,7 +286,7 @@ export function ProfilePage() {
           {/* 用户管理（仅管理员） */}
           {hasPermission('canManageUsers') && (
             <button
-              onClick={() => setCurrentPage('admin')}
+              onClick={() => onNavigate('admin')}
               className="w-full flex items-center gap-4 px-6 py-5 hover:bg-kid-border/20 transition-colors border-b border-kid-border"
             >
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">

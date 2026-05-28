@@ -126,7 +126,10 @@ export function AdminPage() {
                 <select
                   value={u.role}
                   onChange={(e) => handleChangeRole(u, e.target.value as UserRole)}
-                  className="text-kid-xs rounded-kid-md border border-kid-border px-2 py-1.5 bg-white text-kid-text"
+                  disabled={u.id === currentUser?.id}
+                  className={`text-kid-xs rounded-kid-md border border-kid-border px-2 py-1.5 bg-white text-kid-text ${
+                    u.id === currentUser?.id ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   <option value="admin">管理员</option>
                   <option value="parent">家长</option>
@@ -134,10 +137,13 @@ export function AdminPage() {
                 </select>
                 <button
                   onClick={() => handleToggleStatus(u)}
+                  disabled={u.id === currentUser?.id}
                   className={`px-3 py-1.5 rounded-kid-md text-kid-xs font-medium transition-colors ${
-                    u.status === 'active'
-                      ? 'bg-red-50 text-red-500 hover:bg-red-100'
-                      : 'bg-green-50 text-kid-primary hover:bg-green-100'
+                    u.id === currentUser?.id
+                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                      : u.status === 'active'
+                        ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                        : 'bg-green-50 text-kid-primary hover:bg-green-100'
                   }`}
                 >
                   {u.status === 'active' ? '禁用' : '启用'}
