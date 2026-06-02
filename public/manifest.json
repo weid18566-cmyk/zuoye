@@ -1,0 +1,26 @@
+{
+  "name": "童梦AI童话剧场",
+  "short_name": "童梦童话",
+  "description": "专为3-8岁儿童设计的AI智能互动童话平台，让孩子在故事中快乐成长",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fbf8",
+  "theme_color": "#64c270",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "books", "kids"],
+  "lang": "zh-CN"
+}

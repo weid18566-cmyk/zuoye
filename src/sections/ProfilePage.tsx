@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useReadingStats, ACHIEVEMENTS } from '@/hooks/useReadingStats';
 import { saveLocalBackup, restoreLocalBackup, hasLocalBackup } from '@/lib/backup';
 import { stories } from '@/data/stories';
 import { PAGE_BREADCRUMBS } from '@/sections/BottomNav';
@@ -25,6 +26,7 @@ export function ProfilePage({
   onStartReading,
 }: ProfilePageProps) {
   const { user, logout, hasPermission, updateUserProfile } = useAuth();
+  const { stats } = useReadingStats();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [username, setUsername] = useState(user?.username || '');
@@ -245,6 +247,49 @@ export function ProfilePage({
                   </div>
                 </button>
               ))}
+            </div>
+          )}
+        </section>
+
+        {/* 阅读统计 */}
+        <section className="bg-white rounded-kid-lg p-6 shadow-kid">
+          <h3 className="font-title text-kid-sm text-kid-text mb-4 flex items-center gap-2">
+            <span className="material-symbols-rounded text-kid-primary">bar_chart</span>
+            阅读统计
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-kid-border/20 rounded-kid-md p-3 text-center">
+              <span className="text-2xl font-title text-kid-primary">{stats.currentStreak}</span>
+              <p className="text-kid-xs text-kid-text/60 mt-1">连续天数 🔥</p>
+            </div>
+            <div className="bg-kid-border/20 rounded-kid-md p-3 text-center">
+              <span className="text-2xl font-title text-kid-primary">{stats.totalStoriesCompleted}</span>
+              <p className="text-kid-xs text-kid-text/60 mt-1">完成故事</p>
+            </div>
+            <div className="bg-kid-border/20 rounded-kid-md p-3 text-center">
+              <span className="text-2xl font-title text-kid-primary">{stats.totalChaptersRead}</span>
+              <p className="text-kid-xs text-kid-text/60 mt-1">阅读章节</p>
+            </div>
+            <div className="bg-kid-border/20 rounded-kid-md p-3 text-center">
+              <span className="text-2xl font-title text-kid-primary">{stats.totalReadingMinutes}</span>
+              <p className="text-kid-xs text-kid-text/60 mt-1">阅读分钟</p>
+            </div>
+          </div>
+          {stats.achievements.length > 0 && (
+            <div className="mt-4">
+              <p className="text-kid-xs text-kid-text/60 mb-2">已获成就</p>
+              <div className="flex flex-wrap gap-2">
+                {stats.achievements.map(id => {
+                  const ach = ACHIEVEMENTS.find(a => a.id === id);
+                  if (!ach) return null;
+                  return (
+                    <span key={id} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-kid-primary/10 text-kid-primary text-kid-xs font-medium">
+                      <span className="material-symbols-rounded text-sm">{ach.icon}</span>
+                      {ach.title}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
         </section>

@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { useAppState } from '@/hooks/useAppState';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ToastProvider, useToast } from '@/components/ui/toast';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { GuideOverlay } from '@/components/ui/tooltip-guide';
 import { PageTransition } from '@/components/ui/page-transition';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useReadingStats, ACHIEVEMENTS } from '@/hooks/useReadingStats';
 import { SplashScreen } from '@/sections/SplashScreen';
 import { StoryLibrary } from '@/sections/StoryLibrary';
 import { ReadingPage } from '@/sections/ReadingPage';
@@ -14,14 +16,15 @@ import { LoginPage } from '@/sections/LoginPage';
 import { RegisterPage } from '@/sections/RegisterPage';
 import { ForgotPasswordPage } from '@/sections/ForgotPasswordPage';
 import { ProfilePage } from '@/sections/ProfilePage';
-import { AdminPage } from '@/sections/AdminPage';
-import { DataManagerPage } from '@/sections/DataManagerPage';
-import { GlobalSettingsPage } from '@/sections/GlobalSettingsPage';
 import { BottomNav, PAGE_BREADCRUMBS } from '@/sections/BottomNav';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
 import { stories } from '@/data/stories';
 import type { Page } from '@/types';
 import './App.css';
+
+const AdminPage = lazy(() => import('@/sections/AdminPage').then(m => ({ default: m.AdminPage })));
+const DataManagerPage = lazy(() => import('@/sections/DataManagerPage').then(m => ({ default: m.DataManagerPage })));
+const GlobalSettingsPage = lazy(() => import('@/sections/GlobalSettingsPage').then(m => ({ default: m.GlobalSettingsPage })));
 
 function Breadcrumb({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: Page) => void }) {
   const info = PAGE_BREADCRUMBS[currentPage];
@@ -90,6 +93,7 @@ function AppContent() {
 
   const { isAuthenticated, isLoading, hasPermission } = useAuth();
   const { addToast } = useToast();
+  const { stats, recordChapterRead, recordStoryComplete, unlockAchievements, newAchievements } = useReadingStats();
   const {
     showOnboarding,
     currentStep,
@@ -117,6 +121,16 @@ function AppContent() {
       setCurrentPage('library');
     }
   }, [isAuthenticated, isLoading, currentPage, setCurrentPage]);
+
+  // 成就解锁通知
+  useEffect(() => {
+    for (const ach of newAchievements) {
+      const detail = ACHIEVEMENTS.find(a => a.id === ach);
+      if (detail) {
+        addToast(`🏆 解锁成就：${detail.title}`, 'success', 4000);
+      }
+    }
+  }, [newAchievements]);
 
   const handleEnterFromSplash = () => {
     handleSetPage(isAuthenticated ? 'library' : 'login');
@@ -147,6 +161,8 @@ function AppContent() {
         progress: 100,
         lastReadAt: Date.now(),
       });
+      recordStoryComplete(story?.category);
+      unlockAchievements();
     }
     handleSetPage('library');
     addToast('阅读完成！下次可以从收藏中继续', 'success');
@@ -161,6 +177,8 @@ function AppContent() {
       progress,
       lastReadAt: Date.now(),
     });
+    recordChapterRead(1);
+    unlockAchievements();
   };
 
   // 修复：用 useEffect 处理 reading 页面无 storyId 的导航
@@ -198,13 +216,13 @@ function AppContent() {
         );
 
       case 'admin':
-        return <AdminPage />;
+        return <Suspense fallback={<div className="min-h-screen bg-kid-bg flex items-center justify-center"><span className="loading-spinner" /></div>}><AdminPage /></Suspense>;
 
       case 'dataManager':
-        return <DataManagerPage />;
+        return <Suspense fallback={<div className="min-h-screen bg-kid-bg flex items-center justify-center"><span className="loading-spinner" /></div>}><DataManagerPage /></Suspense>;
 
       case 'globalSettings':
-        return <GlobalSettingsPage />;
+        return <Suspense fallback={<div className="min-h-screen bg-kid-bg flex items-center justify-center"><span className="loading-spinner" /></div>}><GlobalSettingsPage /></Suspense>;
 
       case 'library':
         return (
@@ -270,9 +288,11 @@ function AppContent() {
   return (
     <div className={`app ${theme}`}>
       <main className="min-h-screen">
-        <PageTransition pageKey={page}>
-          {renderPage()}
-        </PageTransition>
+        <ErrorBoundary>
+          <PageTransition pageKey={page}>
+            {renderPage()}
+          </PageTransition>
+        </ErrorBoundary>
       </main>
 
       <Breadcrumb

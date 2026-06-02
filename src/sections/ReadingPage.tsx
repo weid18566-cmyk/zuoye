@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { stories } from '@/data/stories';
 import type { ViewMode, Story, Choice } from '@/types';
 import { useSwipe } from '@/hooks/useSwipe';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useTTS } from '@/hooks/useTTS';
 
 interface ReadingPageProps {
   storyId: string;
@@ -28,7 +29,13 @@ export function ReadingPage({
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
   const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
+  const [volume, setVolume] = useState(50);
+  const tts = useTTS({ rate: 0.8, lang: 'zh-CN' });
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return () => tts.stop();
+  }, []);
 
   if (!story || story.chapters.length === 0) {
     return (
@@ -94,7 +101,7 @@ export function ReadingPage({
   useSwipe(contentRef, {
     onSwipeLeft: () => handleNext(),
     onSwipeRight: () => handlePrev(),
-    onTap: () => setIsPlaying(prev => !prev),
+    onTap: () => tts.toggle(currentChapter.content),
   }, { threshold: 60, enabled: !showChoices && !showEduMode });
 
   useKeyboard({
@@ -102,8 +109,8 @@ export function ReadingPage({
     bindings: [
       { key: 'ArrowLeft', handler: handlePrev },
       { key: 'ArrowRight', handler: handleNext },
-      { key: ' ', handler: () => setIsPlaying(prev => !prev), description: '播放/暂停' },
-      { key: 'Escape', handler: onBack, description: '返回' },
+      { key: ' ', handler: () => tts.toggle(currentChapter.content), description: '播放/暂停' },
+      { key: 'Escape', handler: () => { tts.stop(); onBack(); }, description: '返回' },
       { key: 'f', handler: () => onComplete(), description: '完成阅读' },
     ],
   });
@@ -121,7 +128,7 @@ export function ReadingPage({
       {/* 顶部导航 */}
       <header className="sticky top-0 z-40 bg-kid-bg/90 backdrop-blur-sm px-5 py-4">
         <div className="flex items-center justify-between">
-          <button onClick={onBack} className="btn-icon">
+          <button onClick={() => { tts.stop(); onBack(); }} className="btn-icon">
             <span className="material-symbols-rounded text-kid-primary">arrow_back</span>
           </button>
           
@@ -219,11 +226,11 @@ export function ReadingPage({
         <div className="flex items-center justify-between">
           {/* 播放控制 */}
           <button 
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => tts.toggle(currentChapter.content)}
             className="w-14 h-14 rounded-full bg-kid-primary text-white flex items-center justify-center shadow-kid-btn transition-transform active:scale-95"
           >
             <span className="material-symbols-rounded text-2xl">
-              {isPlaying ? 'pause' : 'play_arrow'}
+              {tts.isSpeaking && !tts.isPaused ? 'pause' : 'play_arrow'}
             </span>
           </button>
 
