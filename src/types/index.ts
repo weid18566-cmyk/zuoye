@@ -3,7 +3,7 @@ export interface Story {
   id: string;
   title: string;
   cover: string;
-  category: 'grimm' | 'andersen' | 'chinese' | 'fable' | 'myth';
+  category: 'grimm' | 'andersen' | 'chinese' | 'fable' | 'myth' | 'ai-branch';
   categoryName: string;
   ageRange: string;
   minAge: number;

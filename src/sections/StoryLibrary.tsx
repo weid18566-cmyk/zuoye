@@ -432,7 +432,7 @@ function StoryCard({ story, index, isFavorite, onToggleFavorite, onClick, scale 
       )}
       <div className="mt-2 flex items-center gap-1">
         <span className="material-symbols-rounded text-kid-primary text-sm">
-          {story.category === 'grimm' ? 'forest' : story.category === 'andersen' ? 'waves' : story.category === 'chinese' ? 'temple' : story.category === 'myth' ? 'auto_awesome' : 'psychology'}
+          {story.category === 'grimm' ? 'forest' : story.category === 'andersen' ? 'waves' : story.category === 'chinese' ? 'temple' : story.category === 'myth' ? 'auto_awesome' : story.category === 'ai-branch' ? 'neurology' : 'psychology'}
         </span>
         <span className="text-kid-xs text-kid-primary">{story.categoryName}</span>
       </div>
@@ -477,7 +477,7 @@ function StoryListItem({ story, index, isFavorite, onToggleFavorite, onClick, sc
           <span className="age-badge">{story.ageRange}</span>
           <span className="text-kid-xs text-kid-primary flex items-center gap-1">
             <span className="material-symbols-rounded text-sm">
-              {story.category === 'grimm' ? 'forest' : story.category === 'andersen' ? 'waves' : story.category === 'chinese' ? 'temple' : story.category === 'myth' ? 'auto_awesome' : 'psychology'}
+              {story.category === 'grimm' ? 'forest' : story.category === 'andersen' ? 'waves' : story.category === 'chinese' ? 'temple' : story.category === 'myth' ? 'auto_awesome' : story.category === 'ai-branch' ? 'neurology' : 'psychology'}
             </span>
             {story.categoryName}
           </span>
