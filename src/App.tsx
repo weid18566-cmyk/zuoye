@@ -94,7 +94,7 @@ function AppContent() {
 
   const { isAuthenticated, isLoading, hasPermission } = useAuth();
   const { addToast } = useToast();
-  const { stats, recordChapterRead, recordStoryComplete, unlockAchievements, newAchievements } = useReadingStats();
+  const { recordChapterRead, recordStoryComplete, unlockAchievements, newAchievements } = useReadingStats();
   const {
     showOnboarding,
     currentStep,

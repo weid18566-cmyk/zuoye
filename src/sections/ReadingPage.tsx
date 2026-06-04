@@ -26,7 +26,6 @@ export function ReadingPage({
 }: ReadingPageProps) {
   const story = stories.find(s => s.id === storyId);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
@@ -337,7 +336,7 @@ interface EduModeModalProps {
   story: Story;
 }
 
-function EduModeModal({ onClose, story }: EduModeModalProps) {
+function EduModeModal({ onClose }: EduModeModalProps) {
   const [activeTab, setActiveTab] = useState<'character' | 'emotion'>('character');
 
   return (

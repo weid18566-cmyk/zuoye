@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { stories } from '@/data/stories';
 import type { ReadingProgress, Favorite, RecentStory } from '@/types';
 
