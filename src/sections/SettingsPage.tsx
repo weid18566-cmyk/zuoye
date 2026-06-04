@@ -73,11 +73,11 @@ export function SettingsPage({
               <span className="material-symbols-rounded text-kid-text/40">slow_motion_video</span>
               <input
                 type="range"
-                min="0.5"
-                max="1.5"
-                step="0.1"
-                value={aiConfig.speechRate}
-                onChange={(e) => onUpdateAIConfig({ speechRate: parseFloat(e.target.value) })}
+                min="5"
+                max="15"
+                step="1"
+                value={Math.round(aiConfig.speechRate * 10)}
+                onChange={(e) => onUpdateAIConfig({ speechRate: parseInt(e.target.value) / 10 })}
                 className="flex-1 h-3 rounded-full bg-kid-border appearance-none cursor-pointer accent-kid-primary"
               />
               <span className="material-symbols-rounded text-kid-text/40">fast_forward</span>

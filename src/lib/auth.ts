@@ -1,11 +1,13 @@
 import type { UserRole, Permission } from '@/types';
 
 function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  const bytes = window.crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  return [...bytes].map((b, i) => {
+    const hex = b.toString(16).padStart(2, '0');
+    return (i === 4 || i === 6 || i === 8 || i === 10) ? `-${hex}` : hex;
+  }).join('');
 }
 
 export function generateId(): string {
@@ -54,7 +56,8 @@ export async function verifyPassword(password: string, storedHash: string, store
 export function generateToken(): string {
   const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
   const randomPart = uint8ArrayToBase64(randomBytes);
-  return `ks_${randomPart}_${Date.now()}`;
+  const nonce = Math.floor(Date.now() / 60000).toString(36);
+  return `ks_${randomPart}_${nonce}`;
 }
 
 export function validateEmail(email: string): boolean {

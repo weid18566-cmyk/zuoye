@@ -3,8 +3,11 @@ import type { User, UserCredential } from '@/types';
 const DB_NAME = 'kidstory-auth';
 const DB_VERSION = 2;
 
+let dbPromise: Promise<IDBDatabase> | null = null;
+
 function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  if (!dbPromise) {
+    dbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event) => {
@@ -43,9 +46,12 @@ function openDB(): Promise<IDBDatabase> {
     };
 
     request.onerror = (event) => {
+      dbPromise = null;
       reject((event.target as IDBOpenDBRequest).error);
     };
   });
+  }
+  return dbPromise;
 }
 
 async function getStore(mode: IDBTransactionMode, storeName: string): Promise<IDBObjectStore> {
