@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Theme, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale, RecentStory, PageVisit } from '@/types';
+import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale, RecentStory, PageVisit } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { safeJsonParse } from '@/lib/utils';
 import { getDefaultAIConfig } from '@/lib/ai-client';
