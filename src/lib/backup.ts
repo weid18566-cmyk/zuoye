@@ -1,28 +1,28 @@
 import type { AIConfig, BackupData, User, UserCredential } from '@/types';
 import { safeJsonParse } from '@/lib/utils';
 import { getAllUserData, importUsers } from './db';
+import { getDefaultAIConfig } from './ai-client';
 
 const BACKUP_KEY = 'kidstory-backup';
-const defaultAIConfig: AIConfig = {
-  model: 'claude',
-  speechRate: 0.8,
-  contentFilter: true,
-  maxSessionDuration: 15,
-};
+const _defaultConfig = getDefaultAIConfig();
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function normalizeAIConfig(value: unknown): AIConfig {
-  if (!isRecord(value)) return defaultAIConfig;
-
+  if (!isRecord(value)) return { ..._defaultConfig };
+  const def = _defaultConfig;
   return {
-    model: typeof value.model === 'string' ? value.model : defaultAIConfig.model,
-    speechRate: typeof value.speechRate === 'number' ? value.speechRate : defaultAIConfig.speechRate,
-    contentFilter: typeof value.contentFilter === 'boolean' ? value.contentFilter : defaultAIConfig.contentFilter,
-    maxSessionDuration:
-      typeof value.maxSessionDuration === 'number' ? value.maxSessionDuration : defaultAIConfig.maxSessionDuration,
+    model: typeof value.model === 'string' ? value.model : def.model,
+    speechRate: typeof value.speechRate === 'number' ? value.speechRate : def.speechRate,
+    contentFilter: typeof value.contentFilter === 'boolean' ? value.contentFilter : def.contentFilter,
+    maxSessionDuration: typeof value.maxSessionDuration === 'number' ? value.maxSessionDuration : def.maxSessionDuration,
+    provider: typeof value.provider === 'string' ? (value.provider as AIConfig['provider']) : def.provider,
+    apiKey: typeof value.apiKey === 'string' ? value.apiKey : def.apiKey,
+    apiEndpoint: typeof value.apiEndpoint === 'string' ? value.apiEndpoint : def.apiEndpoint,
+    temperature: typeof value.temperature === 'number' ? value.temperature : def.temperature,
+    maxTokens: typeof value.maxTokens === 'number' ? value.maxTokens : def.maxTokens,
   };
 }
 

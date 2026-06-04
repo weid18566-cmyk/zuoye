@@ -335,7 +335,7 @@ interface EduModeModalProps {
   story: Story;
 }
 
-function EduModeModal({ onClose }: EduModeModalProps) {
+function EduModeModal({ onClose, story }: EduModeModalProps) {
   const [activeTab, setActiveTab] = useState<'character' | 'emotion'>('character');
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { validateEmail, validatePhone, validateUsername, validatePassword } from '@/lib/auth';
 import type { UserRole } from '@/types';
 
 export function RegisterPage() {
@@ -18,6 +19,22 @@ export function RegisterPage() {
 
     if (!username.trim() || !email.trim() || !phone.trim() || !password) {
       setError('请填写所有必填项');
+      return;
+    }
+    if (!validateUsername(username.trim())) {
+      setError('用户名格式不正确（2-20位字母、数字、中文、下划线）');
+      return;
+    }
+    if (!validateEmail(email.trim())) {
+      setError('邮箱格式不正确');
+      return;
+    }
+    if (!validatePhone(phone.trim())) {
+      setError('手机号格式不正确');
+      return;
+    }
+    if (!validatePassword(password)) {
+      setError('密码长度应为6-32位');
       return;
     }
     if (password !== confirmPassword) {

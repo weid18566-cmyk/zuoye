@@ -89,7 +89,7 @@ export function SplashScreen({ onEnter }: SplashScreenProps) {
 
       <div className="relative z-10 flex flex-col items-center px-8">
         <div className={`text-8xl mb-8 transition-all duration-700 ${
-          titleIndex >= titleText.length ? 'animate-float' : 'opacity-50 scale-75'
+          titleIndex >= titleText.length ? 'animate-float-slow' : 'opacity-50 scale-75'
         }`}>
           📚
         </div>

@@ -97,6 +97,7 @@ export interface AIRequest {
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
+  messages?: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
 }
 
 // AI 调用响应

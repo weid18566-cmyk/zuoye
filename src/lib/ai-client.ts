@@ -67,7 +67,10 @@ function buildHeaders(config: AIConfig): Record<string, string> {
 function buildBody(config: AIConfig, request: AIRequest): Record<string, unknown> {
   const temp = request.temperature ?? config.temperature;
   const tokens = request.maxTokens ?? config.maxTokens;
-  const messages = buildMessages(request);
+  const messages = request.messages?.map(m => ({
+    role: m.role,
+    content: m.content,
+  })) || buildMessages(request);
 
   switch (config.provider) {
     case 'anthropic':
@@ -222,37 +225,15 @@ export async function chatConversation(
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
   systemPrompt?: string
 ): Promise<AIResponse> {
-  if (!config.apiKey && config.provider !== 'ollama') {
-    return { content: '', model: '', error: '请先配置API密钥' };
-  }
-
-  const endpoint = getEndpoint(config);
-  const headers = buildHeaders(config);
-  const allMessages = [
-    { role: 'system', content: systemPrompt || DEFAULT_SYSTEM_PROMPT },
-    ...messages,
-  ];
-
-  const temp = config.temperature;
-  const tokens = config.maxTokens;
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ model: config.model, messages: allMessages, temperature: temp, max_tokens: tokens, stream: false }),
-      signal: AbortSignal.timeout?.(30000),
-    });
-    if (!response.ok) {
-      const errText = await response.text().catch(() => '');
-      return { content: '', model: '', error: `API错误(${response.status}): ${errText.slice(0, 100)}` };
-    }
-    const data = await response.json();
-    return parseResponse(config.provider === 'anthropic' ? 'openai' : config.provider, data);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : '未知错误';
-    return { content: '', model: '', error: msg.includes('timeout') ? '请求超时' : `连接失败: ${msg}` };
-  }
+  return callAI(config, {
+    systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
+    prompt: messages[messages.length - 1]?.content || '',
+    messages: [
+      { role: 'system', content: systemPrompt || DEFAULT_SYSTEM_PROMPT },
+      ...messages,
+    ],
+    maxTokens: config.maxTokens,
+  });
 }
 
 // ============ 预置模型列表 ============

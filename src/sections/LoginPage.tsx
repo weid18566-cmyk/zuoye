@@ -80,7 +80,7 @@ export function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-red-500 text-kid-xs bg-red-50 rounded-kid-md px-4 py-3 animate-fade-in-up">
+            <p className="text-red-500 text-kid-xs bg-red-50 rounded-kid-md px-4 py-3 animate-fade-in-up" role="alert">
               {error}
             </p>
           )}

@@ -46,7 +46,7 @@ export function usePullToRefresh({
     if (pullDistance >= threshold) {
       setIsRefreshing(true);
       setPullDistance(threshold);
-      try { await onRefresh(); } catch {}
+      try { await onRefresh(); } catch (e) { console.error('[PullToRefresh]', e); }
       setPullDistance(0);
       setIsRefreshing(false);
     } else {

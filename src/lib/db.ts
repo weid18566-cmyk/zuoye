@@ -82,7 +82,7 @@ export async function createUser(
 
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
   });
 }
 
@@ -141,7 +141,7 @@ export async function deleteUser(id: string): Promise<void> {
 
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
   });
 }
 
@@ -167,7 +167,7 @@ export async function clearDatabase(): Promise<void> {
   await wrapRequest(tx.objectStore('credentials').clear());
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
   });
 }
 
@@ -185,6 +185,6 @@ export async function importUsers(users: User[], credentials: UserCredential[]):
 
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
   });
 }
