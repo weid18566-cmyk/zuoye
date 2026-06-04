@@ -1,14 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Theme, Page, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale, RecentStory, PageVisit } from '@/types';
+import type { Theme, AIConfig, ReadingProgress, Favorite, ViewMode, LayoutMode, SortOrder, ViewScale, RecentStory, PageVisit } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { safeJsonParse } from '@/lib/utils';
+import { getDefaultAIConfig } from '@/lib/ai-client';
 
-const defaultAIConfig: AIConfig = {
-  model: 'claude',
-  speechRate: 0.8,
-  contentFilter: true,
-  maxSessionDuration: 15,
-};
+const defaultAIConfig: AIConfig = getDefaultAIConfig();
 
 function getStorageKey(userId: string, suffix: string): string {
   return `kidstory-${userId}-${suffix}`;

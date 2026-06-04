@@ -73,6 +73,44 @@ export interface AIConfig {
   speechRate: number;
   contentFilter: boolean;
   maxSessionDuration: number;
+  provider: AIProvider;
+  apiKey: string;
+  apiEndpoint: string;
+  temperature: number;
+  maxTokens: number;
+}
+
+export type AIProvider = 'openai' | 'anthropic' | 'ollama' | 'custom';
+
+export interface AIModelInfo {
+  id: string;
+  name: string;
+  provider: AIProvider;
+  description: string;
+  maxTokens: number;
+}
+
+// AI 调用请求
+export interface AIRequest {
+  prompt: string;
+  systemPrompt?: string;
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+}
+
+// AI 调用响应
+export interface AIResponse {
+  content: string;
+  model: string;
+  usage?: { promptTokens: number; completionTokens: number };
+  error?: string;
+}
+
+// 对话消息
+export interface AIMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
 }
 
 // 主题类型

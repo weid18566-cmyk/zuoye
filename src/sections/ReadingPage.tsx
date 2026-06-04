@@ -4,6 +4,8 @@ import type { ViewMode, Story, Choice } from '@/types';
 import { useSwipe } from '@/hooks/useSwipe';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useTTS } from '@/hooks/useTTS';
+import { useAI } from '@/hooks/useAI';
+import type { AIResponse } from '@/types';
 
 interface ReadingPageProps {
   storyId: string;
@@ -31,6 +33,9 @@ export function ReadingPage({
   const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
   const [volume, setVolume] = useState(50);
   const tts = useTTS({ rate: 0.8, lang: 'zh-CN' });
+  const ai = useAI();
+  const [aiResponse, setAIResponse] = useState<AIResponse | null>(null);
+  const [showAIChat, setShowAIChat] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -269,14 +274,48 @@ export function ReadingPage({
           </div>
         </div>
 
-        {/* 幼教模式入口 */}
-        <button
-          onClick={() => setShowEduMode(true)}
-          className="mt-4 w-full py-3 rounded-kid-md bg-kid-secondary/20 text-kid-primary flex items-center justify-center gap-2"
-        >
-          <span className="material-symbols-rounded">school</span>
-          <span className="text-kid-sm font-medium">进入幼教模式</span>
-        </button>
+        {/* AI互动 & 幼教入口 */}
+        <div className="mt-4 space-y-3">
+          <button
+            onClick={async () => {
+              if (!ai.aiConfig.apiKey && ai.aiConfig.provider !== 'ollama') {
+                setAIResponse({ content: '', model: '', error: '请先在设置中配置AI接口' });
+                return;
+              }
+              setShowAIChat(!showAIChat);
+              if (!showAIChat && !aiResponse) {
+                const result = await ai.storyContinue(currentChapter.content, '继续读下去');
+                setAIResponse(result);
+              }
+            }}
+            className="w-full py-3 rounded-kid-md bg-purple-50 text-purple-600 flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors"
+          >
+            <span className="material-symbols-rounded">auto_awesome</span>
+            <span className="text-kid-sm font-medium">
+              {ai.loading ? 'AI思考中...' : 'AI故事精灵'}
+            </span>
+          </button>
+
+          {showAIChat && aiResponse && (
+            <div className="bg-purple-50/50 rounded-kid-lg p-4 animate-fade-in-up">
+              {aiResponse.error ? (
+                <p className="text-kid-xs text-red-500">{aiResponse.error}</p>
+              ) : (
+                <>
+                  <p className="text-kid-sm text-kid-text leading-relaxed whitespace-pre-wrap">{aiResponse.content}</p>
+                  <button onClick={() => { setShowAIChat(false); setAIResponse(null); }}
+                    className="text-kid-xs text-kid-primary/70 mt-2 hover:underline">收起</button>
+                </>
+              )}
+            </div>
+          )}
+
+          <button onClick={() => setShowEduMode(true)}
+            className="w-full py-3 rounded-kid-md bg-kid-secondary/20 text-kid-primary flex items-center justify-center gap-2">
+            <span className="material-symbols-rounded">school</span>
+            <span className="text-kid-sm font-medium">进入幼教模式</span>
+          </button>
+        </div>
       </div>
 
       {/* 幼教模式弹窗 */}

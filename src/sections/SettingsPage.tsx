@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { aiModels } from '@/data/stories';
+import { useState, useCallback } from 'react';
 import type { AIConfig, Theme } from '@/types';
+import { AISettingsPanel } from '@/components/ui/ai-settings-panel';
+import { useAI } from '@/hooks/useAI';
 
 interface SettingsPageProps {
   aiConfig: AIConfig;
@@ -18,18 +19,24 @@ export function SettingsPage({
   onBack 
 }: SettingsPageProps) {
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const { testConnection, loading: aiTesting, error: aiError } = useAI();
+  const [connectionResult, setConnectionResult] = useState<string | null>(null);
 
   const handleSave = () => {
     setShowSaveSuccess(true);
     setTimeout(() => setShowSaveSuccess(false), 2000);
   };
 
+  const handleTestConnection = useCallback(async () => {
+    setConnectionResult(null);
+    const result = await testConnection();
+    setConnectionResult(result.error ? `连接失败: ${result.error}` : '连接成功！AI已就绪');
+  }, [testConnection]);
+
   return (
     <div className="min-h-screen bg-kid-bg pb-24">
-      {/* 顶部渐变 */}
       <div className="absolute top-0 left-0 right-0 h-40 gradient-top pointer-events-none" />
 
-      {/* 头部 */}
       <header className="relative z-10 px-5 pt-12 pb-4">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="btn-icon">
@@ -39,46 +46,15 @@ export function SettingsPage({
         </div>
       </header>
 
-      {/* 设置内容 */}
       <main className="px-5 space-y-6">
-        {/* AI模型设置 */}
-        <section className="bg-white rounded-kid-lg p-6 shadow-kid">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-kid-primary/10 flex items-center justify-center">
-              <span className="material-symbols-rounded text-kid-primary text-2xl">smart_toy</span>
-            </div>
-            <div>
-              <h2 className="font-title text-kid-md text-kid-text">AI模型</h2>
-              <p className="text-kid-xs text-kid-text/60">选择本地AI模型</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {aiModels.map((model) => (
-              <label
-                key={model.id}
-                className={`flex items-center gap-4 p-4 rounded-kid-md border-2 cursor-pointer transition-all ${
-                  aiConfig.model === model.id
-                    ? 'border-kid-primary bg-kid-primary/5'
-                    : 'border-kid-border hover:border-kid-primary/50'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="aiModel"
-                  value={model.id}
-                  checked={aiConfig.model === model.id}
-                  onChange={() => onUpdateAIConfig({ model: model.id })}
-                  className="w-5 h-5 accent-kid-primary"
-                />
-                <div className="flex-1">
-                  <p className="text-kid-sm font-medium text-kid-text">{model.name}</p>
-                  <p className="text-kid-xs text-kid-text/60">{model.description}</p>
-                </div>
-              </label>
-            ))}
-          </div>
-        </section>
+        {/* AI大模型接入 */}
+        <AISettingsPanel
+          config={aiConfig}
+          onUpdate={onUpdateAIConfig}
+          onTestConnection={handleTestConnection}
+          isTesting={aiTesting}
+          connectionResult={connectionResult}
+        />
 
         {/* 语速设置 */}
         <section className="bg-white rounded-kid-lg p-6 shadow-kid">
