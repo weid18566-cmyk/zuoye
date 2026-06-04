@@ -11,6 +11,7 @@ interface AISettingsProps {
 }
 
 const providerLabels: Record<AIProvider, string> = {
+  deepseek: 'DeepSeek ⭐',
   openai: 'OpenAI',
   anthropic: 'Anthropic',
   ollama: 'Ollama(本地)',
@@ -77,10 +78,10 @@ export function AISettingsPanel({
           <label className="block text-kid-sm text-kid-text font-medium mb-2">API密钥</label>
           <input type="password" value={config.apiKey}
             onChange={e => onUpdate({ apiKey: e.target.value })}
-            placeholder={config.provider === 'openai' ? 'sk-...' : config.provider === 'anthropic' ? 'sk-ant-...' : '输入API密钥'}
+            placeholder={config.provider === 'deepseek' ? 'sk-...' : config.provider === 'openai' ? 'sk-...' : config.provider === 'anthropic' ? 'sk-ant-...' : '输入API密钥'}
             className="input-kid w-full text-kid-xs" />
           <p className="text-kid-xs text-kid-text/40 mt-1">
-            {config.provider === 'openai' ? '在 platform.openai.com 获取' : config.provider === 'anthropic' ? '在 console.anthropic.com 获取' : '密钥仅保存在您的浏览器中'}
+            {config.provider === 'deepseek' ? '在 platform.deepseek.com 获取' : config.provider === 'openai' ? '在 platform.openai.com 获取' : config.provider === 'anthropic' ? '在 console.anthropic.com 获取' : '密钥仅保存在您的浏览器中'}
           </p>
         </div>
       )}

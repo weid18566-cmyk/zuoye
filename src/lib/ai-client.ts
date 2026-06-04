@@ -19,13 +19,13 @@ function buildMessages(request: AIRequest): AIMessage[] {
 
 export function getDefaultAIConfig(): AIConfig {
   return {
-    model: 'gpt-4o-mini',
+    model: 'deepseek-v4-pro',
     speechRate: 0.8,
     contentFilter: true,
     maxSessionDuration: 15,
-    provider: 'openai',
+    provider: 'deepseek',
     apiKey: '',
-    apiEndpoint: 'https://api.openai.com/v1',
+    apiEndpoint: 'https://api.deepseek.com/v1',
     temperature: 0.7,
     maxTokens: 500,
   };
@@ -33,6 +33,8 @@ export function getDefaultAIConfig(): AIConfig {
 
 function getEndpoint(config: AIConfig): string {
   switch (config.provider) {
+    case 'deepseek':
+      return (config.apiEndpoint || 'https://api.deepseek.com/v1') + '/chat/completions';
     case 'anthropic':
       return config.apiEndpoint || 'https://api.anthropic.com/v1/messages';
     case 'ollama':
@@ -51,6 +53,7 @@ function buildHeaders(config: AIConfig): Record<string, string> {
       headers['x-api-key'] = config.apiKey;
       headers['anthropic-version'] = '2023-06-01';
       break;
+    case 'deepseek':
     case 'openai':
     case 'custom':
       headers['Authorization'] = `Bearer ${config.apiKey}`;
@@ -216,7 +219,10 @@ export async function checkContentSafety(config: AIConfig, content: string): Pro
 // ============ 预置模型列表 ============
 
 export const availableModels = [
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai' as const, description: 'OpenAI高性能小模型 ⭐推荐', maxTokens: 4096 },
+  { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro', provider: 'deepseek' as const, description: 'DeepSeek旗舰模型 ⭐推荐', maxTokens: 8192 },
+  { id: 'deepseek-chat', name: 'DeepSeek Chat V3', provider: 'deepseek' as const, description: 'DeepSeek对话模型', maxTokens: 8192 },
+  { id: 'deepseek-reasoner', name: 'DeepSeek R1', provider: 'deepseek' as const, description: 'DeepSeek推理增强', maxTokens: 8192 },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai' as const, description: 'OpenAI高性能小模型', maxTokens: 4096 },
   { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai' as const, description: 'OpenAI最新旗舰模型', maxTokens: 8192 },
   { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic' as const, description: 'Anthropic安全可靠的模型', maxTokens: 4096 },
   { id: 'claude-3-haiku', name: 'Claude 3 Haiku', provider: 'anthropic' as const, description: 'Anthropic快速轻量模型', maxTokens: 4096 },

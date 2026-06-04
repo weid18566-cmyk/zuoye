@@ -80,7 +80,7 @@ export interface AIConfig {
   maxTokens: number;
 }
 
-export type AIProvider = 'openai' | 'anthropic' | 'ollama' | 'custom';
+export type AIProvider = 'deepseek' | 'openai' | 'anthropic' | 'ollama' | 'custom';
 
 export interface AIModelInfo {
   id: string;
