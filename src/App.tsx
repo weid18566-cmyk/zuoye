@@ -18,6 +18,7 @@ import { ForgotPasswordPage } from '@/sections/ForgotPasswordPage';
 import { ProfilePage } from '@/sections/ProfilePage';
 import { BottomNav, PAGE_BREADCRUMBS } from '@/sections/BottomNav';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
+import { AIAssistantPage } from '@/sections/AIAssistantPage';
 import { stories } from '@/data/stories';
 import type { Page } from '@/types';
 import './App.css';
@@ -223,6 +224,9 @@ function AppContent() {
 
       case 'globalSettings':
         return <Suspense fallback={<div className="min-h-screen bg-kid-bg flex items-center justify-center"><span className="loading-spinner" /></div>}><GlobalSettingsPage /></Suspense>;
+
+      case 'aiAssistant':
+        return <AIAssistantPage />;
 
       case 'library':
         return (

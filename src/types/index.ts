@@ -124,7 +124,7 @@ export type Language = 'zh-CN' | 'en' | 'ja';
 
 // 页面类型
 export type Page = 'splash' | 'library' | 'reading' | 'education' | 'settings' | 'collection' |
-  'login' | 'register' | 'forgotPassword' | 'profile' | 'admin' | 'dataManager' | 'globalSettings';
+  'login' | 'register' | 'forgotPassword' | 'profile' | 'admin' | 'dataManager' | 'globalSettings' | 'aiAssistant';
 
 // 用户角色类型
 export type UserRole = 'admin' | 'parent' | 'child';

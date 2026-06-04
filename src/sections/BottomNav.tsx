@@ -12,6 +12,7 @@ interface BottomNavProps {
 }
 
 const mainItems: NavMenuItem[] = [
+  { id: 'aiAssistant', label: 'AI精灵', icon: 'psychology', activeIcon: 'psychology_alt' },
   { id: 'library', label: '童话库', icon: 'menu_book', activeIcon: 'auto_stories' },
   { id: 'reading', label: '阅读中', icon: 'import_contacts', activeIcon: 'book' },
   { id: 'collection', label: '收藏', icon: 'favorite_border', activeIcon: 'favorite' },
@@ -169,4 +170,5 @@ export const PAGE_BREADCRUMBS: Record<string, { label: string; parent?: Page; ic
   admin: { label: '用户管理', parent: 'profile', icon: 'admin_panel_settings' },
   dataManager: { label: '数据管理', parent: 'profile', icon: 'database' },
   globalSettings: { label: '全局设置', parent: 'profile', icon: 'settings' },
+  aiAssistant: { label: 'AI助手', icon: 'psychology' },
 };
