@@ -111,31 +111,31 @@ export function AIAssistantPage() {
       )}
 
       {/* 消息区 */}
-      <div className="flex-1 px-5 space-y-4 overflow-y-auto pt-2">
+      <div className="flex-1 px-5 space-y-6 overflow-y-auto pt-2 no-scrollbar">
         {messages.map(msg => (
-          <div key={msg.id} className={`flex gap-3 animate-fade-in-up ${msg.role === 'assistant' ? '' : 'flex-row-reverse'}`}>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0 ${
-              msg.role === 'assistant' ? 'bg-gradient-to-br from-purple-400 to-pink-400' : 'bg-kid-primary/20'
+          <div key={msg.id} className={`flex gap-3 ${msg.role === 'assistant' ? '' : 'flex-row-reverse'}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm animate-bounce-in ${
+              msg.role === 'assistant' ? 'bg-gradient-to-br from-purple-400 to-pink-400' : 'bg-white border-2 border-kid-primary/20'
             }`}>
               {msg.role === 'assistant' ? '🧚' : '👦'}
             </div>
-            <div className={`max-w-[75%] px-4 py-3 rounded-2xl text-kid-sm leading-relaxed whitespace-pre-wrap ${
-              msg.role === 'assistant'
-                ? 'bg-white rounded-tl-sm shadow-sm text-kid-text'
-                : 'bg-kid-primary text-white rounded-tr-sm'
+            <div className={`chat-bubble ${
+              msg.role === 'assistant' ? 'chat-bubble-assistant' : 'chat-bubble-user'
             }`}>
-              {msg.content}
+              <div className="whitespace-pre-wrap text-kid-sm leading-relaxed">
+                {msg.content}
+              </div>
             </div>
           </div>
         ))}
 
         {loading && (
-          <div className="flex gap-3 animate-fade-in-up">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-xl">🧚</div>
-            <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm px-5 py-3 flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-purple-300 animate-bounce-soft" />
-              <div className="w-2 h-2 rounded-full bg-purple-300 animate-bounce-soft" style={{ animationDelay: '0.15s' }} />
-              <div className="w-2 h-2 rounded-full bg-purple-300 animate-bounce-soft" style={{ animationDelay: '0.3s' }} />
+          <div className="flex gap-3 animate-in fade-in slide-in-from-left-4 duration-300">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl shadow-sm">🧚</div>
+            <div className="chat-bubble chat-bubble-assistant flex items-center gap-1.5 py-4">
+              <div className="w-2 h-2 rounded-full bg-kid-primary/40 animate-bounce" />
+              <div className="w-2 h-2 rounded-full bg-kid-primary/40 animate-bounce [animation-delay:0.2s]" />
+              <div className="w-2 h-2 rounded-full bg-kid-primary/40 animate-bounce [animation-delay:0.4s]" />
             </div>
           </div>
         )}

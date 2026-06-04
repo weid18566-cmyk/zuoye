@@ -108,7 +108,7 @@ export function StoryLibrary({
 
       <header className="relative z-10 px-5 pt-12 pb-4">
         <div className="flex items-center justify-between mb-6">
-          <div>
+          <div className="animate-bounce-in">
             <h1 className="font-title text-kid-lg text-kid-text">童话库</h1>
             <p className="text-kid-xs text-kid-text/60 mt-1">
               {filteredStories.length} 个故事
@@ -319,7 +319,7 @@ export function StoryLibrary({
       {/* 故事内容 */}
       <main className="px-5">
         {layoutMode === 'list' ? (
-          <div className="space-y-3">
+          <div className="space-y-3 animate-stagger-fade-in">
             {filteredStories.map((story, index) => (
               <StoryListItem
                 key={story.id}
@@ -333,7 +333,7 @@ export function StoryLibrary({
             ))}
           </div>
         ) : layoutMode === 'compact' ? (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 animate-stagger-fade-in">
             {filteredStories.map((story, index) => (
               <StoryCompactCard
                 key={story.id}
@@ -346,7 +346,7 @@ export function StoryLibrary({
             ))}
           </div>
         ) : (
-          <div className={`grid ${scale.cols} ${scale.gap}`}>
+          <div className={`grid ${scale.cols} ${scale.gap} animate-stagger-fade-in`}>
             {filteredStories.map((story, index) => (
               <StoryCard
                 key={story.id}

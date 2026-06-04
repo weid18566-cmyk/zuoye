@@ -182,18 +182,20 @@ export function ReadingPage({
       </div>
 
       {/* 故事内容 */}
-      <div className="flex-1 px-5 pb-32 relative overflow-hidden">
+      <div className="flex-1 px-5 pb-32 relative overflow-hidden flex flex-col items-center">
         <div
-          className={`bg-white rounded-kid-lg p-6 shadow-kid transition-all duration-300 ${
+          className={`w-full max-w-2xl bg-white dark:bg-kid-dark-card rounded-[2.5rem] p-8 shadow-kid border-2 border-kid-primary/5 transition-all duration-300 ${
             animDirection === 'left' ? 'animate-slide-out-left' :
             animDirection === 'right' ? 'animate-slide-out-right' :
             'animate-fade-in-scale'
           }`}
           key={currentChapterIndex}
         >
-          <p className="text-kid-body text-kid-text leading-relaxed">
-            {currentChapter.content}
-          </p>
+          <div className="prose prose-kid max-w-none">
+            <p className="text-kid-body text-kid-text leading-[1.8] first-letter:text-4xl first-letter:font-title first-letter:text-kid-primary first-letter:mr-1 first-letter:float-left">
+              {currentChapter.content}
+            </p>
+          </div>
         </div>
 
         {/* 支线选择 */}

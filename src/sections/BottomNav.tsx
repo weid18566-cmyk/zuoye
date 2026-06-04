@@ -93,24 +93,20 @@ export function BottomNav({
               <button
                 key={item.id}
                 onClick={handleClick}
-              className={`nav-item relative px-4 py-1.5 rounded-kid-md transition-all touch-ripple ${
-                isActive ? 'active' : ''
-              }`}
+                className={`nav-item relative ${isActive ? 'active' : ''}`}
               >
-                <span className={`material-symbols-rounded text-2xl transition-all ${
-                  isActive ? 'filled' : ''
-                }`}>
-                  {isActive && item.activeIcon ? item.activeIcon : item.icon}
-                </span>
-                <span className="text-kid-xs font-medium">{item.label}</span>
-
-                {isActive && (
-                  <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-kid-primary" />
-                )}
-
+                <div className="nav-icon-bg">
+                  <span className={`material-symbols-rounded text-2xl transition-all ${
+                    isActive ? 'fill-1' : ''
+                  }`}>
+                    {isActive ? (item.activeIcon || item.icon) : item.icon}
+                  </span>
+                </div>
+                <span className="nav-label">{item.label}</span>
+                
                 {showBadge && (
-                  <span className="absolute -top-0.5 right-2 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-kid-xs flex items-center justify-center" style={{ fontSize: '10px' }}>
-                    {favoriteCount > 99 ? '99+' : favoriteCount}
+                  <span className="absolute top-1 right-2 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full animate-bounce">
+                    {favoriteCount}
                   </span>
                 )}
               </button>

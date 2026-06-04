@@ -7,10 +7,11 @@ interface PageTransitionProps {
 
 export function PageTransition({ children, pageKey }: PageTransitionProps) {
   return (
-    <div className="relative overflow-hidden" key={pageKey}>
-      <div className="page-enter">
-        {children}
-      </div>
+    <div 
+      className="relative w-full h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ease-kid-out" 
+      key={pageKey}
+    >
+      {children}
     </div>
   );
 }

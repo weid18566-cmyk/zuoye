@@ -149,6 +149,23 @@ module.exports = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        "slide-out-left": {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(-20px)", opacity: "0" },
+        },
+        "slide-out-right": {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(20px)", opacity: "0" },
+        },
+        "fade-in-scale": {
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "bounce-in": {
+          "0%": { transform: "scale(0.5)", opacity: "0" },
+          "70%": { transform: "scale(1.1)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -163,6 +180,10 @@ module.exports = {
         "slide-in-up": "slide-in-up 0.5s ease-out forwards",
         "bounce-soft": "bounce-soft 1s ease-in-out infinite",
         "spin-slow": "spin-slow 3s linear infinite",
+        "slide-out-left": "slide-out-left 0.2s ease-in forwards",
+        "slide-out-right": "slide-out-right 0.2s ease-in forwards",
+        "fade-in-scale": "fade-in-scale 0.3s ease-out forwards",
+        "bounce-in": "bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
       },
       transitionDuration: {
         'kid': '400ms',
