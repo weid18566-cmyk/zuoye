@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAI } from '@/hooks/useAI';
-import type { AIMessage, AIConfig } from '@/types';
-import { callAI } from '@/lib/ai-client';
+import { chatConversation } from '@/lib/ai-client';
 
 interface ChatMessage {
   id: string;
@@ -29,18 +28,18 @@ const SUGGESTED_TOPICS = [
   { icon: 'music_note', text: '唱首童谣' },
 ];
 
-let msgId = 0;
-
 export function AIAssistantPage() {
+  const msgIdRef = useRef(1);
   const { aiConfig } = useAI();
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
-    { id: String(++msgId), role: 'assistant',
+    { id: String(msgIdRef.current++), role: 'assistant',
       content: '哈喽小朋友～我是你的AI小伙伴"童梦精灵"！✨\n你可以问我任何问题——故事、认字、小知识、唱儿歌……我都会陪你一起探索！你想聊什么呢？🌈',
       timestamp: Date.now() },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const msgIdRef = useRef(1);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -48,13 +47,13 @@ export function AIAssistantPage() {
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return;
-    const userMsg: ChatMessage = { id: String(++msgId), role: 'user', content: text.trim(), timestamp: Date.now() };
+    const userMsg: ChatMessage = { id: String(++msgIdRef.current), role: 'user', content: text.trim(), timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
 
     if (!aiConfig.apiKey && aiConfig.provider !== 'ollama') {
-      const errMsg: ChatMessage = { id: String(++msgId), role: 'assistant',
+      const errMsg: ChatMessage = { id: String(++msgIdRef.current), role: 'assistant',
         content: '哎呀，我好像还没"睡醒"呢～😴\n\n请让爸爸妈妈在设置里帮我接上AI大脑（配置API密钥），我就能和你聊天啦！', timestamp: Date.now() };
       setMessages(prev => [...prev, errMsg]);
       setLoading(false);
@@ -62,17 +61,13 @@ export function AIAssistantPage() {
     }
 
     const conversation = messages.concat(userMsg).map(m => ({
-      role: m.role === 'assistant' ? 'assistant' as const : 'user' as const,
+      role: (m.role === 'assistant' ? 'assistant' : 'user') as 'user' | 'assistant',
       content: m.content,
     }));
 
-    const result = await callAI(aiConfig, {
-      systemPrompt: ASSISTANT_SYSTEM_PROMPT,
-      prompt: conversation.slice(-6).map(m => `${m.role === 'assistant' ? '童梦精灵' : '小朋友'}: ${m.content}`).join('\n\n'),
-      maxTokens: 500,
-    });
+    const result = await chatConversation(aiConfig, conversation.slice(-6), ASSISTANT_SYSTEM_PROMPT);
 
-    const reply: ChatMessage = { id: String(++msgId), role: 'assistant',
+    const reply: ChatMessage = { id: String(++msgIdRef.current), role: 'assistant',
       content: result.error ? `呜呜，我遇到了一点小麻烦～😢\n${result.error}\n待会再试一次吧！` : result.content,
       timestamp: Date.now() };
     setMessages(prev => [...prev, reply]);

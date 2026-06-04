@@ -19,7 +19,7 @@ export function SettingsPage({
   onBack 
 }: SettingsPageProps) {
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
-  const { testConnection, loading: aiTesting, error: aiError } = useAI();
+  const { testConnection, loading: aiTesting } = useAI();
   const [connectionResult, setConnectionResult] = useState<string | null>(null);
 
   const handleSave = () => {
@@ -29,7 +29,7 @@ export function SettingsPage({
 
   const handleTestConnection = useCallback(async () => {
     setConnectionResult(null);
-    const result = await testConnection();
+    const result = await testConnection(aiConfig);
     setConnectionResult(result.error ? `连接失败: ${result.error}` : '连接成功！AI已就绪');
   }, [testConnection]);
 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import type { AIResponse } from '@/types';
 import {
   callAI,
@@ -7,29 +7,14 @@ import {
   askEducationQuestion,
   generateStory,
   checkContentSafety,
-  getDefaultAIConfig,
 } from '@/lib/ai-client';
 import { useAppState } from './useAppState';
-import { safeJsonParse } from '@/lib/utils';
-
-const AI_CONFIG_KEY = 'kidstory-ai-config';
-
-export function loadAIConfig() {
-  const saved = localStorage.getItem(AI_CONFIG_KEY);
-  const parsed = safeJsonParse<ReturnType<typeof getDefaultAIConfig>>(saved, getDefaultAIConfig());
-  return { ...getDefaultAIConfig(), ...parsed };
-}
-
-export function saveAIConfig(config: ReturnType<typeof getDefaultAIConfig>) {
-  localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(config));
-}
 
 export function useAI() {
   const { aiConfig, updateAIConfig } = useAppState();
   const [loading, setLoading] = useState(false);
   const [lastResponse, setLastResponse] = useState<AIResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
 
   const execute = useCallback(async (
     fn: () => Promise<AIResponse>,
@@ -72,8 +57,9 @@ export function useAI() {
     return checkContentSafety(aiConfig, content);
   }, [aiConfig]);
 
-  const testConnection = useCallback(() => {
-    return execute(() => callAI(aiConfig, { prompt: '你好！请说"连接成功"四个字', maxTokens: 20 }));
+  const testConnection = useCallback((overrideConfig?: typeof aiConfig) => {
+    const config = overrideConfig || aiConfig;
+    return execute(() => callAI(config, { prompt: '你好！请说"连接成功"四个字', maxTokens: 20 }));
   }, [execute, aiConfig]);
 
   return {

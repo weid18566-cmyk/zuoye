@@ -31,7 +31,6 @@ export function ReadingPage({
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
   const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
-  const [volume, setVolume] = useState(50);
   const tts = useTTS({ rate: 0.8, lang: 'zh-CN' });
   const ai = useAI();
   const [aiResponse, setAIResponse] = useState<AIResponse | null>(null);
@@ -282,11 +281,13 @@ export function ReadingPage({
                 setAIResponse({ content: '', model: '', error: '请先在设置中配置AI接口' });
                 return;
               }
-              setShowAIChat(!showAIChat);
-              if (!showAIChat && !aiResponse) {
-                const result = await ai.storyContinue(currentChapter.content, '继续读下去');
-                setAIResponse(result);
-              }
+              setShowAIChat(prev => {
+                const willShow = !prev;
+                if (willShow && !aiResponse) {
+                  ai.storyContinue(currentChapter.content, '继续读下去').then(setAIResponse);
+                }
+                return willShow;
+              });
             }}
             className="w-full py-3 rounded-kid-md bg-purple-50 text-purple-600 flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors"
           >
