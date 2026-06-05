@@ -21,24 +21,6 @@ export interface SupabaseUser {
   created_at: number;
 }
 
-const USERS_TABLE = 'users';
-
-function mapToSupabase(user: Record<string, unknown>): SupabaseUser {
-  return {
-    id: user.id as string,
-    username: user.username as string,
-    email: user.email as string,
-    phone: user.phone as string,
-    role: user.role as string,
-    avatar: user.avatar as string,
-    status: user.status as string,
-    parent_id: (user.parent_id as string) || null,
-    password_hash: user.password_hash as string,
-    salt: user.salt as string,
-    created_at: user.created_at as number,
-  };
-}
-
 export async function supabaseGet(endpoint: string, query?: Record<string, string>): Promise<Record<string, unknown>[]> {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${endpoint}`);
   if (query) {

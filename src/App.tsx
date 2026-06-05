@@ -126,7 +126,7 @@ function AppContent() {
   // 成就解锁通知
   useEffect(() => {
     for (const ach of newAchievements) {
-      const detail = ACHIEVEMENTS.find(a => a.id === ach);
+      const detail = ACHIEVEMENTS.find(a => a.id === String(ach));
       if (detail) {
         addToast(`🏆 解锁成就：${detail.title}`, 'success', 4000);
       }

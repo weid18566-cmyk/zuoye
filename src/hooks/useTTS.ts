@@ -8,7 +8,7 @@ interface UseTTSOptions {
 }
 
 export function useTTS(options: UseTTSOptions = {}) {
-  const { rate = 0.8, pitch = 1.1, lang = 'zh-CN', onEnd } = options;
+  const { rate = 0.8, pitch = 1.1, lang = 'zh-CN', onEnd: _onEnd } = options;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
