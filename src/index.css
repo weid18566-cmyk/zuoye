@@ -368,7 +368,9 @@
   
   /* 云朵装饰 */
   .cloud {
-    @apply absolute opacity-60 animate-float-x-slow;
+    position: absolute;
+    opacity: 0.6;
+    animation: float-x-slow 6s ease-in-out infinite;
   }
   
   /* 涟漪效果 */
