@@ -115,7 +115,7 @@ export function CollectionPage({
             <p className="text-kid-md text-kid-text/50 mb-2">还没有收藏故事</p>
             <p className="text-kid-sm text-kid-text/40">去童话库发现精彩故事吧</p>
           </div>
-        )}
+        ) : (
 
         {activeTab === 'favorites' && favoriteStories.length > 0 && (
           <div className="space-y-4">
