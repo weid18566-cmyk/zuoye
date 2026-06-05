@@ -1,190 +1,122 @@
 import type { User, UserCredential } from '@/types';
+import {
+  supabaseGet,
+  supabasePost,
+  supabasePatch,
+  supabaseDelete,
+  type SupabaseUser,
+} from './supabase';
 
-const DB_NAME = 'kidstory-auth';
-const DB_VERSION = 2;
-
-let dbPromise: Promise<IDBDatabase> | null = null;
-
-function openDB(): Promise<IDBDatabase> {
-  if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      const tx = (event.target as IDBOpenDBRequest).transaction;
-
-      if (!db.objectStoreNames.contains('users')) {
-        const store = db.createObjectStore('users', { keyPath: 'id' });
-        store.createIndex('username', 'username', { unique: true });
-        store.createIndex('email', 'email', { unique: true });
-        store.createIndex('phone', 'phone', { unique: false });
-        store.createIndex('role', 'role', { unique: false });
-      } else if (tx) {
-        const store = tx.objectStore('users');
-        if (!store.indexNames.contains('username')) {
-          store.createIndex('username', 'username', { unique: true });
-        }
-        if (!store.indexNames.contains('email')) {
-          store.createIndex('email', 'email', { unique: true });
-        }
-        if (!store.indexNames.contains('phone')) {
-          store.createIndex('phone', 'phone', { unique: false });
-        }
-        if (!store.indexNames.contains('role')) {
-          store.createIndex('role', 'role', { unique: false });
-        }
-      }
-
-      if (!db.objectStoreNames.contains('credentials')) {
-        db.createObjectStore('credentials', { keyPath: 'id' });
-      }
-    };
-
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBOpenDBRequest).result);
-    };
-
-    request.onerror = (event) => {
-      dbPromise = null;
-      reject((event.target as IDBOpenDBRequest).error);
-    };
-  });
-  }
-  return dbPromise;
+function toUser(row: SupabaseUser): User {
+  return {
+    id: row.id,
+    username: row.username,
+    email: row.email,
+    phone: row.phone,
+    role: row.role as User['role'],
+    avatar: row.avatar,
+    createdAt: row.created_at,
+    status: row.status as User['status'],
+    parentId: row.parent_id,
+  };
 }
 
-async function getStore(mode: IDBTransactionMode, storeName: string): Promise<IDBObjectStore> {
-  const db = await openDB();
-  const tx = db.transaction(storeName, mode);
-  return tx.objectStore(storeName);
+function toSupabase(user: User, cred: UserCredential): Record<string, unknown> {
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    avatar: user.avatar,
+    status: user.status,
+    parent_id: user.parentId,
+    password_hash: cred.passwordHash,
+    salt: cred.salt,
+    created_at: user.createdAt,
+  };
 }
 
-async function wrapRequest<T>(request: IDBRequest<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-export async function createUser(
-  user: User,
-  credential: UserCredential
-): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(['users', 'credentials'], 'readwrite');
-
-  const userStore = tx.objectStore('users');
-  const credStore = tx.objectStore('credentials');
-
-  await wrapRequest(userStore.add(user));
-  await wrapRequest(credStore.add(credential));
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
-  });
+export async function createUser(user: User, credential: UserCredential): Promise<void> {
+  await supabasePost('users', toSupabase(user, credential));
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const store = await getStore('readonly', 'users');
-  return wrapRequest(store.get(id));
+  const rows = await supabaseGet('users', { id: `eq.${id}` });
+  return rows.length > 0 ? toUser(rows[0] as unknown as SupabaseUser) : null;
 }
 
 export async function getUserByUsername(username: string): Promise<User | null> {
-  const store = await getStore('readonly', 'users');
-  const index = store.index('username');
-  return wrapRequest(index.get(username));
+  const rows = await supabaseGet('users', { username: `eq.${username}` });
+  return rows.length > 0 ? toUser(rows[0] as unknown as SupabaseUser) : null;
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const store = await getStore('readonly', 'users');
-  const index = store.index('email');
-  return wrapRequest(index.get(email));
+  const rows = await supabaseGet('users', { email: `eq.${email}` });
+  return rows.length > 0 ? toUser(rows[0] as unknown as SupabaseUser) : null;
 }
 
 export async function getUserByPhone(phone: string): Promise<User | null> {
-  const store = await getStore('readonly', 'users');
-  try {
-    const index = store.index('phone');
-    return wrapRequest(index.get(phone));
-  } catch {
-    const all = await wrapRequest(store.getAll());
-    return all.find((u) => u.phone === phone) || null;
-  }
+  const rows = await supabaseGet('users', { phone: `eq.${phone}` });
+  return rows.length > 0 ? toUser(rows[0] as unknown as SupabaseUser) : null;
 }
 
 export async function getCredential(id: string): Promise<UserCredential | null> {
-  const store = await getStore('readonly', 'credentials');
-  return wrapRequest(store.get(id));
+  const rows = await supabaseGet('users', { id: `eq.${id}` });
+  if (rows.length === 0) return null;
+  const u = rows[0] as unknown as SupabaseUser;
+  return { id: u.id, passwordHash: u.password_hash, salt: u.salt };
 }
 
 export async function getAllUsers(): Promise<User[]> {
-  const store = await getStore('readonly', 'users');
-  return wrapRequest(store.getAll());
+  const rows = await supabaseGet('users');
+  return rows.map(r => toUser(r as unknown as SupabaseUser));
 }
 
 export async function updateUser(user: User): Promise<void> {
-  const store = await getStore('readwrite', 'users');
-  await wrapRequest(store.put(user));
+  await supabasePatch('users', {
+    username: user.username,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    avatar: user.avatar,
+    status: user.status,
+    parent_id: user.parentId,
+  }, { id: user.id });
 }
 
 export async function deleteUser(id: string): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(['users', 'credentials'], 'readwrite');
-
-  const userStore = tx.objectStore('users');
-  const credStore = tx.objectStore('credentials');
-
-  await wrapRequest(userStore.delete(id));
-  await wrapRequest(credStore.delete(id));
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
-  });
+  await supabaseDelete('users', { id });
 }
 
 export async function updatePassword(id: string, newCredential: UserCredential): Promise<void> {
-  const store = await getStore('readwrite', 'credentials');
-  await wrapRequest(store.put(newCredential));
+  await supabasePatch('users', {
+    password_hash: newCredential.passwordHash,
+    salt: newCredential.salt,
+  }, { id });
 }
 
 export async function getAllUserData(): Promise<{ users: User[]; credentials: UserCredential[] }> {
-  const db = await openDB();
-  const tx = db.transaction(['users', 'credentials'], 'readonly');
-
-  const users = await wrapRequest(tx.objectStore('users').getAll());
-  const credentials = await wrapRequest(tx.objectStore('credentials').getAll());
-
+  const rows = await supabaseGet('users');
+  const users = rows.map(r => toUser(r as unknown as SupabaseUser));
+  const credentials = rows.map(r => ({
+    id: (r as unknown as SupabaseUser).id,
+    passwordHash: (r as unknown as SupabaseUser).password_hash,
+    salt: (r as unknown as SupabaseUser).salt,
+  }));
   return { users, credentials };
 }
 
 export async function clearDatabase(): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(['users', 'credentials'], 'readwrite');
-  await wrapRequest(tx.objectStore('users').clear());
-  await wrapRequest(tx.objectStore('credentials').clear());
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
-  });
+  const rows = await supabaseGet('users');
+  for (const r of rows) {
+    await supabaseDelete('users', { id: (r as unknown as SupabaseUser).id });
+  }
 }
 
 export async function importUsers(users: User[], credentials: UserCredential[]): Promise<void> {
   await clearDatabase();
-  const db = await openDB();
-  const tx = db.transaction(['users', 'credentials'], 'readwrite');
-
-  for (const user of users) {
-    await wrapRequest(tx.objectStore('users').add(user));
+  for (let i = 0; i < users.length; i++) {
+    await supabasePost('users', toSupabase(users[i], credentials[i]));
   }
-  for (const cred of credentials) {
-    await wrapRequest(tx.objectStore('credentials').add(cred));
-  }
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error || new Error('Transaction failed'));
-  });
 }
