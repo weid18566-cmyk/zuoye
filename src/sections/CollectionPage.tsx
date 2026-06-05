@@ -121,38 +121,40 @@ export function CollectionPage({
           <div className="space-y-4">
             {favoriteStories.map(({ story, progress, addedAt }, index) => (
               <div
-                key={story!.id}
+                key={story?.id || `fav-${index}`}
                 className="bg-white rounded-kid-lg p-4 shadow-kid animate-fade-in-up"
                 style={{ animationDelay: `${index * 80}ms` }}
               >
                 <div className="flex gap-4">
                   {/* 封面 */}
                   <div 
-                    onClick={() => onSelectStory(story!.id)}
+                    onClick={() => story && onSelectStory(story.id)}
                     className="w-24 h-24 rounded-kid-md overflow-hidden flex-shrink-0 cursor-pointer"
                   >
-                    <img
-                      src={story!.cover}
-                      alt={story!.title}
-                      className="w-full h-full object-cover"
-                    />
+                    {story?.cover && (
+                      <img
+                        src={story.cover}
+                        alt={story.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
 
                   {/* 信息 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
-                      <div onClick={() => onSelectStory(story!.id)} className="cursor-pointer flex-1">
+                      <div onClick={() => story && onSelectStory(story.id)} className="cursor-pointer flex-1">
                         <h3 className="font-title text-kid-md text-kid-text truncate">
-                          {story!.title}
+                          {story?.title || '未知故事'}
                         </h3>
                         <p className="text-kid-xs text-kid-text/60 mt-1">
-                          {story!.categoryName} · {story!.ageRange}
+                          {story?.categoryName} · {story?.ageRange}
                         </p>
                       </div>
                       
                       {/* 删除按钮 */}
                       <button
-                        onClick={() => setShowDeleteConfirm(story!.id)}
+                        onClick={() => story && setShowDeleteConfirm(story.id)}
                         className="btn-icon w-10 h-10 ml-2"
                       >
                         <span className="material-symbols-rounded text-kid-text/40">
@@ -179,12 +181,12 @@ export function CollectionPage({
 
                     {/* 继续阅读按钮 */}
                     <button
-                      onClick={() => onSelectStory(story!.id)}
+                      type="button"
+                      onClick={() => story && onSelectStory(story.id)}
                       className="mt-3 text-kid-xs text-kid-primary flex items-center gap-1"
                     >
                       <span className="material-symbols-rounded text-sm">play_circle</span>
-                      {progress ? '继续阅读' : '开始阅读'}
-                    </button>
+                      {progress && progress.progress > 0 ? '继续阅读' : '开始阅读'}                    </button>
                   </div>
                 </div>
 
