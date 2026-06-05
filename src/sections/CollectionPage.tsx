@@ -105,7 +105,7 @@ export function CollectionPage({
 
       {/* 列表 */}
       <main className="px-5">
-        {activeTab === 'favorites' && favoriteStories.length === 0 ? (
+        {activeTab === 'favorites' && favoriteStories.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-24 h-24 rounded-full bg-kid-border/50 flex items-center justify-center mb-6">
               <span className="material-symbols-rounded text-5xl text-kid-text/30">
@@ -115,7 +115,7 @@ export function CollectionPage({
             <p className="text-kid-md text-kid-text/50 mb-2">还没有收藏故事</p>
             <p className="text-kid-sm text-kid-text/40">去童话库发现精彩故事吧</p>
           </div>
-        ) : (
+        )}
 
         {activeTab === 'favorites' && favoriteStories.length > 0 && (
           <div className="space-y-4">
