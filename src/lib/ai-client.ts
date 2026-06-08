@@ -24,7 +24,7 @@ export function getDefaultAIConfig(): AIConfig {
     contentFilter: true,
     maxSessionDuration: 15,
     provider: 'deepseek',
-    apiKey: '',
+    apiKey: 'sk-d88908b03d314a769a56c2d03184ea07',
     apiEndpoint: 'https://api.deepseek.com/v1',
     temperature: 0.7,
     maxTokens: 500,
@@ -88,17 +88,21 @@ function buildBody(config: AIConfig, request: AIRequest): Record<string, unknown
         stream: false,
         options: { temperature: temp, num_predict: tokens },
       };
-    default:
+    default: {
+      const hasSystemMsg = messages.some(m => m.role === 'system');
       return {
         model: config.model,
-        messages: [
-          { role: 'system', content: request.systemPrompt || DEFAULT_SYSTEM_PROMPT },
-          ...messages.filter(m => m.role !== 'system'),
-        ],
+        messages: hasSystemMsg
+          ? messages
+          : [
+              { role: 'system', content: request.systemPrompt || DEFAULT_SYSTEM_PROMPT },
+              ...messages,
+            ],
         temperature: temp,
         max_tokens: tokens,
         stream: false,
       };
+    }
   }
 }
 

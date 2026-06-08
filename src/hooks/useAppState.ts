@@ -38,7 +38,9 @@ export function useAppState() {
   const [aiConfig, setAIConfig] = useState<AIConfig>(() => {
     const saved = localStorage.getItem(getStorageKey(userId, 'config'));
     const parsed = safeJsonParse<Partial<AIConfig>>(saved, {});
-    return { ...defaultAIConfig, ...parsed };
+    const merged = { ...defaultAIConfig, ...parsed };
+    if (!merged.apiKey) merged.apiKey = defaultAIConfig.apiKey;
+    return merged;
   });
 
   // 阅读进度
@@ -90,7 +92,9 @@ export function useAppState() {
     setTheme(savedTheme === 'dark' ? 'dark' : 'light');
 
     const parsedConfig = safeJsonParse<Partial<AIConfig>>(savedConfig, {});
-    setAIConfig({ ...defaultAIConfig, ...parsedConfig });
+    const mergedConfig = { ...defaultAIConfig, ...parsedConfig };
+    if (!mergedConfig.apiKey) mergedConfig.apiKey = defaultAIConfig.apiKey;
+    setAIConfig(mergedConfig);
 
     const parsedProgress = safeJsonParse<ReadingProgress[]>(savedProgress, []);
     setReadingProgress(Array.isArray(parsedProgress) ? parsedProgress : []);
