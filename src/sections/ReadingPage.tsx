@@ -30,7 +30,12 @@ export function ReadingPage({
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
   const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
+  const ai = useAI();
+  const [aiResponse, setAIResponse] = useState<AIResponse | null>(null);
+  const [showAIChat, setShowAIChat] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const tts = useTTS({ rate: 0.9, lang: 'zh-CN', onEnd: () => {
+    if (!story) return;
     if (currentChapterIndex < story.chapters.length - 1) {
       setAnimDirection('left');
       setTimeout(() => {
@@ -38,14 +43,11 @@ export function ReadingPage({
         setCurrentChapterIndex(next);
         saveCurrentProgress(next);
         setAnimDirection(null);
-        tts.speak(story.chapters[next].content);
+        const nextContent = story.chapters[next]?.content;
+        if (nextContent) tts.speak(nextContent);
       }, 200);
     }
   }});
-  const ai = useAI();
-  const [aiResponse, setAIResponse] = useState<AIResponse | null>(null);
-  const [showAIChat, setShowAIChat] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => tts.stop();
