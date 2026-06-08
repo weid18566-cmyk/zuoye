@@ -30,7 +30,18 @@ export function ReadingPage({
   const [showChoices, setShowChoices] = useState(false);
   const [showEduMode, setShowEduMode] = useState(false);
   const [animDirection, setAnimDirection] = useState<'left' | 'right' | null>(null);
-  const tts = useTTS({ rate: 0.8, lang: 'zh-CN' });
+  const tts = useTTS({ rate: 0.9, lang: 'zh-CN', onEnd: () => {
+    if (currentChapterIndex < story.chapters.length - 1) {
+      setAnimDirection('left');
+      setTimeout(() => {
+        const next = currentChapterIndex + 1;
+        setCurrentChapterIndex(next);
+        saveCurrentProgress(next);
+        setAnimDirection(null);
+        tts.speak(story.chapters[next].content);
+      }, 200);
+    }
+  }});
   const ai = useAI();
   const [aiResponse, setAIResponse] = useState<AIResponse | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
@@ -119,9 +130,9 @@ export function ReadingPage({
   });
 
   return (
-    <div className="min-h-screen bg-kid-bg flex flex-col" ref={contentRef}>
+    <div className="min-h-screen bg-kid-bg flex flex-col overflow-y-auto" ref={contentRef}>
       {/* 进度条 */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-kid-border">
+      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-kid-border">
         <div 
           className="h-full bg-kid-primary transition-all duration-500"
           style={{ width: `${progress}%` }}
@@ -129,29 +140,28 @@ export function ReadingPage({
       </div>
 
       {/* 顶部导航 */}
-      <header className="sticky top-0 z-40 bg-kid-bg/90 backdrop-blur-sm px-5 py-4">
-        <div className="flex items-center justify-between">
-          <button onClick={() => { tts.stop(); onBack(); }} className="btn-icon">
+      <header className="sticky top-0 z-40 bg-kid-bg/95 backdrop-blur-sm px-4 py-3">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <button onClick={() => { tts.stop(); onBack(); }} className="btn-icon w-10 h-10">
             <span className="material-symbols-rounded text-kid-primary">arrow_back</span>
           </button>
           
-          <h2 className="font-title text-kid-md text-kid-text flex-1 text-center truncate mx-4">
+          <h2 className="font-title text-kid-sm text-kid-text flex-1 text-center truncate mx-2">
             {story.title}
           </h2>
 
-          {/* 视角切换 */}
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             {(['protagonist', 'supporting', 'npc'] as ViewMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => onViewModeChange(mode)}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all text-xs ${
                   viewMode === mode 
-                    ? 'bg-kid-primary text-white scale-110' 
-                    : 'bg-kid-border/50 text-kid-text/50'
+                    ? 'bg-kid-primary text-white scale-105' 
+                    : 'bg-kid-border/30 text-kid-text/40'
                 }`}
               >
-                <span className="material-symbols-rounded">
+                <span className="material-symbols-rounded text-base">
                   {mode === 'protagonist' ? 'person' : mode === 'supporting' ? 'group' : 'visibility'}
                 </span>
               </button>
@@ -161,163 +171,148 @@ export function ReadingPage({
       </header>
 
       {/* 插画区域 */}
-      <div className="relative px-5 mb-6">
-        <div className="aspect-[4/3] rounded-kid-lg overflow-hidden bg-kid-border shadow-kid">
-          <img
-            src={currentChapter.illustration}
-            alt={currentChapter.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        {/* 章节标题 */}
-        <div className="absolute bottom-4 left-8 right-8">
-          <div className="soft-panel px-4 py-2 text-center">
-            <span className="font-title text-kid-sm text-kid-text">
-              第{currentChapterIndex + 1}章：{currentChapter.title}
-            </span>
+      <div className="px-4 pt-2">
+        <div className="relative max-w-2xl mx-auto">
+          <div className="aspect-[16/10] rounded-2xl overflow-hidden bg-kid-border shadow-kid">
+            <img
+              src={currentChapter.illustration}
+              alt={currentChapter.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute bottom-3 left-3 right-3">
+            <div className="soft-panel px-4 py-1.5 text-center inline-block">
+              <span className="font-title text-kid-xs text-kid-text/80">
+                第{currentChapterIndex + 1}章 · {currentChapter.title}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 故事内容 */}
-      <div className="flex-1 px-5 pb-32 relative overflow-hidden flex flex-col items-center">
+      <div className="flex-1 px-4 pt-4 pb-40 relative flex flex-col items-center">
         <div
-          className={`w-full max-w-2xl bg-white dark:bg-kid-dark-card rounded-[2.5rem] p-8 shadow-kid border-2 border-kid-primary/5 transition-all duration-300 ${
+          className={`w-full max-w-2xl bg-white rounded-[2rem] p-6 shadow-kid border border-kid-border/30 transition-all duration-300 ${
             animDirection === 'left' ? 'animate-slide-out-left' :
             animDirection === 'right' ? 'animate-slide-out-right' :
             'animate-fade-in-scale'
           }`}
           key={currentChapterIndex}
         >
-          <div className="prose prose-kid max-w-none">
-            <p className="text-kid-body text-kid-text leading-[1.8] first-letter:text-4xl first-letter:font-title first-letter:text-kid-primary first-letter:mr-1 first-letter:float-left">
-              {currentChapter.content}
-            </p>
+          <div className="text-kid-body text-kid-text leading-[1.9] whitespace-pre-line">
+            {currentChapter.content}
           </div>
         </div>
 
         {/* 支线选择 */}
-        {currentChapter.choices && !showChoices && (
-          <button
-            onClick={() => setShowChoices(true)}
-            className="mt-6 w-full btn-secondary"
-          >
-            <span className="material-symbols-rounded">fork_right</span>
-            <span>做出选择</span>
-          </button>
-        )}
+        <div className="w-full max-w-2xl mt-4 space-y-2">
+          {currentChapter.choices && !showChoices && (
+            <button
+              onClick={() => setShowChoices(true)}
+              className="w-full py-3 rounded-2xl bg-kid-primary/10 text-kid-primary font-medium flex items-center justify-center gap-2 hover:bg-kid-primary/20 transition-colors"
+            >
+              <span className="material-symbols-rounded">fork_right</span>
+              <span className="text-kid-sm">做出选择</span>
+            </button>
+          )}
 
-        {showChoices && currentChapter.choices && (
-          <div className="mt-6 space-y-3 animate-slide-in-up">
-            <p className="text-kid-sm text-kid-text/70 text-center mb-4">你想怎么做？</p>
-            {currentChapter.choices.map((choice, i) => (
-              <button
-                key={choice.id}
-                onClick={() => handleChoice(choice)}
-                className="w-full btn-secondary justify-start animate-fade-in-up"
-                style={{ animationDelay: `${i * 100}ms` }}
-              >
-                <span className="material-symbols-rounded">{choice.icon}</span>
-                <span>{choice.text}</span>
-              </button>
-            ))}
-          </div>
-        )}
+          {showChoices && currentChapter.choices && (
+            <>
+              <p className="text-kid-xs text-kid-text/50 text-center">你想怎么做？</p>
+              {currentChapter.choices.map((choice, i) => (
+                <button
+                  key={choice.id}
+                  onClick={() => handleChoice(choice)}
+                  className="w-full py-3 px-5 rounded-2xl bg-white border-2 border-kid-border text-left flex items-center gap-3 hover:border-kid-primary/40 active:scale-[0.98] transition-all animate-fade-in-up"
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  <span className="material-symbols-rounded text-kid-primary text-xl">{choice.icon}</span>
+                  <span className="text-kid-sm text-kid-text">{choice.text}</span>
+                </button>
+              ))}
+            </>
+          )}
+        </div>
       </div>
 
       {/* 底部控制栏 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-kid-border px-5 py-4 safe-area-bottom">
-        <div className="flex items-center justify-between">
-          {/* 播放控制 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-kid-border px-4 py-3 safe-area-bottom z-50">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
           <button 
             onClick={() => tts.toggle(currentChapter.content)}
-            className="w-14 h-14 rounded-full bg-kid-primary text-white flex items-center justify-center shadow-kid-btn transition-transform active:scale-95"
+            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform active:scale-95 ${
+              tts.isSpeaking && !tts.isPaused ? 'bg-kid-primary text-white animate-pulse-soft' : 'bg-kid-border/30 text-kid-text/60'
+            }`}
           >
-            <span className="material-symbols-rounded text-2xl">
+            <span className="material-symbols-rounded text-xl">
               {tts.isSpeaking && !tts.isPaused ? 'pause' : 'play_arrow'}
             </span>
           </button>
 
-          {/* 翻页控制 */}
           <div className="flex items-center gap-4">
-            <button 
-              onClick={handlePrev}
-              disabled={currentChapterIndex === 0}
-              className="btn-icon disabled:opacity-30"
-            >
+            <button onClick={handlePrev} disabled={currentChapterIndex === 0}
+              className="w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-20 text-kid-text/60 hover:text-kid-primary transition-colors">
               <span className="material-symbols-rounded">skip_previous</span>
             </button>
             
-            <span className="text-kid-sm text-kid-text/60">
-              {currentChapterIndex + 1} / {story.chapters.length}
+            <span className="text-kid-xs text-kid-text/40 tabular-nums w-14 text-center">
+              {currentChapterIndex + 1}/{story.chapters.length}
             </span>
             
-            <button 
-              onClick={handleNext}
-              className="btn-icon"
-            >
+            <button onClick={handleNext}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-kid-text/60 hover:text-kid-primary transition-colors">
               <span className="material-symbols-rounded">skip_next</span>
             </button>
           </div>
 
-          {/* 音量控制 */}
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setVolume(v => v === 0 ? 50 : 0)}
-              className="btn-icon w-10 h-10"
-            >
-              <span className="material-symbols-rounded text-kid-primary">
-                {volume === 0 ? 'volume_off' : volume < 50 ? 'volume_down' : 'volume_up'}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* AI互动 & 幼教入口 */}
-        <div className="mt-4 space-y-3">
-          <button
-            onClick={async () => {
-              if (!ai.aiConfig.apiKey && ai.aiConfig.provider !== 'ollama') {
-                setAIResponse({ content: '', model: '', error: '请先在设置中配置AI接口' });
-                return;
-              }
-              setShowAIChat(prev => {
-                const willShow = !prev;
-                if (willShow && !aiResponse) {
-                  ai.storyContinue(currentChapter.content, '继续读下去').then(setAIResponse);
-                }
-                return willShow;
-              });
-            }}
-            className="w-full py-3 rounded-kid-md bg-purple-50 text-purple-600 flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors"
-          >
-            <span className="material-symbols-rounded">auto_awesome</span>
-            <span className="text-kid-sm font-medium">
-              {ai.loading ? 'AI思考中...' : 'AI故事精灵'}
+          <button onClick={() => setVolume(v => v === 0 ? 50 : 0)}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-kid-text/40 hover:text-kid-primary transition-colors">
+            <span className="material-symbols-rounded text-lg">
+              {volume === 0 ? 'volume_off' : 'volume_up'}
             </span>
           </button>
+        </div>
 
-          {showAIChat && aiResponse && (
-            <div className="bg-purple-50/50 rounded-kid-lg p-4 animate-fade-in-up">
-              {aiResponse.error ? (
-                <p className="text-kid-xs text-red-500">{aiResponse.error}</p>
-              ) : (
-                <>
-                  <p className="text-kid-sm text-kid-text leading-relaxed whitespace-pre-wrap">{aiResponse.content}</p>
-                  <button onClick={() => { setShowAIChat(false); setAIResponse(null); }}
-                    className="text-kid-xs text-kid-primary/70 mt-2 hover:underline">收起</button>
-                </>
-              )}
-            </div>
-          )}
-
+        {/* AI + 幼教入口行 */}
+        <div className="flex items-center gap-2 max-w-2xl mx-auto mt-3">
+          <button onClick={async () => {
+            if (!ai.aiConfig.apiKey && ai.aiConfig.provider !== 'ollama') {
+              setAIResponse({ content: '', model: '', error: '请先在设置中配置AI接口' });
+              return;
+            }
+            setShowAIChat(prev => {
+              const willShow = !prev;
+              if (willShow && !aiResponse) {
+                ai.storyContinue(currentChapter.content, '继续读下去').then(setAIResponse);
+              }
+              return willShow;
+            });
+          }}
+            className="flex-1 py-2 rounded-xl bg-purple-50 text-purple-600 text-kid-xs font-medium flex items-center justify-center gap-1.5 hover:bg-purple-100 transition-colors">
+            <span className="material-symbols-rounded text-base">{ai.loading ? 'hourglass_top' : 'auto_awesome'}</span>
+            <span>{ai.loading ? '思考中...' : 'AI故事精灵'}</span>
+          </button>
           <button onClick={() => setShowEduMode(true)}
-            className="w-full py-3 rounded-kid-md bg-kid-secondary/20 text-kid-primary flex items-center justify-center gap-2">
-            <span className="material-symbols-rounded">school</span>
-            <span className="text-kid-sm font-medium">进入幼教模式</span>
+            className="py-2 px-4 rounded-xl bg-kid-secondary/20 text-kid-primary text-kid-xs font-medium flex items-center gap-1.5 hover:bg-kid-secondary/30 transition-colors">
+            <span className="material-symbols-rounded text-base">school</span>
+            <span>幼教模式</span>
           </button>
         </div>
+
+        {showAIChat && aiResponse && (
+          <div className="mt-3 max-w-2xl mx-auto bg-purple-50/80 rounded-xl p-3 animate-fade-in-up">
+            {aiResponse.error ? (
+              <p className="text-kid-xs text-red-500">{aiResponse.error}</p>
+            ) : (
+              <>
+                <p className="text-kid-xs text-kid-text leading-relaxed">{aiResponse.content}</p>
+                <button onClick={() => { setShowAIChat(false); setAIResponse(null); }}
+                  className="text-kid-xs text-kid-primary/60 mt-1.5 hover:underline">收起</button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 幼教模式弹窗 */}
