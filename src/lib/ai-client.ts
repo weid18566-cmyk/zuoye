@@ -24,8 +24,8 @@ export function getDefaultAIConfig(): AIConfig {
     contentFilter: true,
     maxSessionDuration: 15,
     provider: 'deepseek',
-    apiKey: 'sk-d88908b03d314a769a56c2d03184ea07',
-    apiEndpoint: 'https://api.deepseek.com/v1',
+    apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY || '',
+    apiEndpoint: import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-proxy` : 'https://api.deepseek.com/v1',
     temperature: 0.7,
     maxTokens: 500,
   };
@@ -140,6 +140,11 @@ export async function callAI(config: AIConfig, request: AIRequest): Promise<AIRe
     return { content: '', model: '', error: '请先配置API密钥' };
   }
 
+  // 本地 Ollama 直接请求，其他通过 Supabase Edge Function 代理
+  if (config.provider !== 'ollama' && import.meta.env.VITE_SUPABASE_URL) {
+    return callViaEdgeFunction(config, request);
+  }
+
   const endpoint = getEndpoint(config);
   const headers = buildHeaders(config);
   const body = buildBody(config, request);
@@ -165,6 +170,56 @@ export async function callAI(config: AIConfig, request: AIRequest): Promise<AIRe
       return { content: '', model: '', error: '请求超时，请检查网络或API端点' };
     }
     return { content: '', model: '', error: `连接失败: ${msg}` };
+  }
+}
+
+async function callViaEdgeFunction(config: AIConfig, request: AIRequest): Promise<AIResponse> {
+  const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-proxy`;
+
+  const messages = request.messages?.map(m => ({
+    role: m.role,
+    content: m.content,
+  }));
+
+  try {
+    const response = await fetch(fnUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({
+        provider: config.provider,
+        model: config.model,
+        messages,
+        prompt: request.prompt,
+        systemPrompt: request.systemPrompt,
+        temperature: request.temperature ?? config.temperature,
+        maxTokens: request.maxTokens ?? config.maxTokens,
+        apiEndpoint: config.apiEndpoint,
+        apiKey: config.apiKey,
+      }),
+      signal: AbortSignal.timeout?.(35000),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      return { content: '', model: '', error: `AI代理错误(${response.status}): ${errText.slice(0, 100)}` };
+    }
+
+    const data = await response.json();
+    return {
+      content: data.content || '',
+      model: data.model || '',
+      usage: data.usage,
+      error: data.error,
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '未知错误';
+    if (msg.includes('timeout') || msg.includes('abort')) {
+      return { content: '', model: '', error: '请求超时，请检查网络' };
+    }
+    return { content: '', model: '', error: `Edge Function连接失败: ${msg}` };
   }
 }
 

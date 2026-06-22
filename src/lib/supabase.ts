@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://ejmgqbtyzkrwtfpaqger.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_wc7bJfw_KkQrBjjpxGKJFg_Yxf_li6J';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -112,3 +112,125 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Enable all for anon" ON users
   FOR ALL USING (true) WITH CHECK (true);
 */
+
+// ============ Stories API ============
+
+export interface SupabaseStory {
+  id: string;
+  title: string;
+  content: string;
+  theme: string;
+  age_range: string;
+  category: string;
+  cover_image: string;
+  author_id: string | null;
+  is_published: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export async function fetchStories(): Promise<SupabaseStory[]> {
+  return supabaseGet('stories') as Promise<SupabaseStory[]>;
+}
+
+export async function fetchStoryById(id: string): Promise<SupabaseStory | null> {
+  const rows = await supabaseGet('stories', { id: `eq.${id}` });
+  return rows.length > 0 ? (rows[0] as unknown as SupabaseStory) : null;
+}
+
+export async function createStory(story: Omit<SupabaseStory, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
+  await supabasePost('stories', story as Record<string, unknown>);
+}
+
+// ============ Reading Progress API ============
+
+export interface SupabaseReadingProgress {
+  id: string;
+  user_id: string;
+  story_id: string | null;
+  story_key: string | null;
+  current_page: number;
+  total_pages: number;
+  completed: boolean;
+  last_read_at: number;
+}
+
+export async function fetchProgress(userId: string): Promise<SupabaseReadingProgress[]> {
+  return supabaseGet('reading_progress', { user_id: `eq.${userId}` }) as Promise<SupabaseReadingProgress[]>;
+}
+
+export async function upsertProgress(progress: Omit<SupabaseReadingProgress, 'id'>): Promise<void> {
+  const existing = await supabaseGet('reading_progress', {
+    user_id: `eq.${progress.user_id}`,
+    story_id: progress.story_id ? `eq.${progress.story_id}` : 'is.null',
+    story_key: progress.story_key ? `eq.${progress.story_key}` : 'is.null',
+  });
+  if (existing.length > 0) {
+    await supabasePatch('reading_progress', progress as Record<string, unknown>, { id: (existing[0] as SupabaseReadingProgress).id });
+  } else {
+    await supabasePost('reading_progress', progress as Record<string, unknown>);
+  }
+}
+
+// ============ Favorites API ============
+
+export interface SupabaseFavorite {
+  id: string;
+  user_id: string;
+  story_id: string | null;
+  story_key: string | null;
+  created_at: number;
+}
+
+export async function fetchFavorites(userId: string): Promise<SupabaseFavorite[]> {
+  return supabaseGet('favorites', { user_id: `eq.${userId}` }) as Promise<SupabaseFavorite[]>;
+}
+
+export async function addFavorite(userId: string, storyId?: string, storyKey?: string): Promise<void> {
+  await supabasePost('favorites', { user_id: userId, story_id: storyId || null, story_key: storyKey || null });
+}
+
+export async function removeFavorite(userId: string, storyId?: string, storyKey?: string): Promise<void> {
+  if (storyId) {
+    await supabaseDelete('favorites', { user_id: userId, story_id: storyId });
+  } else if (storyKey) {
+    await supabaseDelete('favorites', { user_id: userId, story_key: storyKey });
+  }
+}
+
+// ============ Reading Stats API ============
+
+export interface SupabaseReadingStats {
+  id: string;
+  user_id: string;
+  total_stories_read: number;
+  total_reading_time_sec: number;
+  longest_streak_days: number;
+  current_streak_days: number;
+  last_read_date: string;
+  achievements: string;
+}
+
+export async function fetchStats(userId: string): Promise<SupabaseReadingStats | null> {
+  const rows = await supabaseGet('reading_stats', { user_id: `eq.${userId}` });
+  return rows.length > 0 ? (rows[0] as unknown as SupabaseReadingStats) : null;
+}
+
+export async function upsertStats(stats: Omit<SupabaseReadingStats, 'id'>): Promise<void> {
+  const existing = await supabaseGet('reading_stats', { user_id: `eq.${stats.user_id}` });
+  if (existing.length > 0) {
+    await supabasePatch('reading_stats', stats as Record<string, unknown>, { id: (existing[0] as SupabaseReadingStats).id });
+  } else {
+    await supabasePost('reading_stats', stats as Record<string, unknown>);
+  }
+}
+
+// ============ Backups API ============
+
+export async function createBackup(userId: string, data: unknown): Promise<void> {
+  await supabasePost('backups', { user_id: userId, data });
+}
+
+export async function fetchBackups(userId: string): Promise<Array<{ id: string; data: unknown; created_at: number }>> {
+  return supabaseGet('backups', { user_id: `eq.${userId}`, order: 'created_at.desc', limit: '10' }) as Promise<Array<{ id: string; data: unknown; created_at: number }>>;
+}

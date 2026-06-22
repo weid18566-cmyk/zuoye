@@ -1,0 +1,39 @@
+# Supabase 本地开发配置
+project_id = "cwcayagwuwuyjhjlvtsp"
+
+[api]
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[storage]
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["https://localhost:5173"]
+
+[functions]
+enabled = true
+
+[functions.ai-proxy]
+enabled = true
+verify_jwt = false
+
+[edge_runtime]
+enabled = true
+
+[hosting]
+enabled = true
+
+# Edge Function 环境变量（服务端密钥，不暴露给前端）
+# 部署后通过 Supabase Dashboard → Settings → Edge Functions 设置
+# 或运行: supabase secrets set DEEPSEEK_API_KEY=sk-xxx

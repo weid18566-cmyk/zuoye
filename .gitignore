@@ -3,3 +3,13 @@ dist
 .vite
 .vercel
 *.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Supabase local
+supabase/.temp
+supabase/.branches
