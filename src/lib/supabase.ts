@@ -130,16 +130,17 @@ export interface SupabaseStory {
 }
 
 export async function fetchStories(): Promise<SupabaseStory[]> {
-  return supabaseGet('stories') as Promise<SupabaseStory[]>;
+  const rows = await supabaseGet('stories');
+  return rows as SupabaseStory[];
 }
 
 export async function fetchStoryById(id: string): Promise<SupabaseStory | null> {
   const rows = await supabaseGet('stories', { id: `eq.${id}` });
-  return rows.length > 0 ? (rows[0] as unknown as SupabaseStory) : null;
+  return rows.length > 0 ? (rows[0] as SupabaseStory) : null;
 }
 
 export async function createStory(story: Omit<SupabaseStory, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
-  await supabasePost('stories', story as Record<string, unknown>);
+  await supabasePost('stories', story as unknown as Record<string, unknown>);
 }
 
 // ============ Reading Progress API ============
@@ -156,7 +157,8 @@ export interface SupabaseReadingProgress {
 }
 
 export async function fetchProgress(userId: string): Promise<SupabaseReadingProgress[]> {
-  return supabaseGet('reading_progress', { user_id: `eq.${userId}` }) as Promise<SupabaseReadingProgress[]>;
+  const rows = await supabaseGet('reading_progress', { user_id: `eq.${userId}` });
+  return rows as SupabaseReadingProgress[];
 }
 
 export async function upsertProgress(progress: Omit<SupabaseReadingProgress, 'id'>): Promise<void> {
@@ -166,9 +168,9 @@ export async function upsertProgress(progress: Omit<SupabaseReadingProgress, 'id
     story_key: progress.story_key ? `eq.${progress.story_key}` : 'is.null',
   });
   if (existing.length > 0) {
-    await supabasePatch('reading_progress', progress as Record<string, unknown>, { id: (existing[0] as SupabaseReadingProgress).id });
+    await supabasePatch('reading_progress', progress as unknown as Record<string, unknown>, { id: (existing[0] as SupabaseReadingProgress).id });
   } else {
-    await supabasePost('reading_progress', progress as Record<string, unknown>);
+    await supabasePost('reading_progress', progress as unknown as Record<string, unknown>);
   }
 }
 
@@ -183,7 +185,8 @@ export interface SupabaseFavorite {
 }
 
 export async function fetchFavorites(userId: string): Promise<SupabaseFavorite[]> {
-  return supabaseGet('favorites', { user_id: `eq.${userId}` }) as Promise<SupabaseFavorite[]>;
+  const rows = await supabaseGet('favorites', { user_id: `eq.${userId}` });
+  return rows as SupabaseFavorite[];
 }
 
 export async function addFavorite(userId: string, storyId?: string, storyKey?: string): Promise<void> {
@@ -213,15 +216,15 @@ export interface SupabaseReadingStats {
 
 export async function fetchStats(userId: string): Promise<SupabaseReadingStats | null> {
   const rows = await supabaseGet('reading_stats', { user_id: `eq.${userId}` });
-  return rows.length > 0 ? (rows[0] as unknown as SupabaseReadingStats) : null;
+  return rows.length > 0 ? (rows[0] as SupabaseReadingStats) : null;
 }
 
 export async function upsertStats(stats: Omit<SupabaseReadingStats, 'id'>): Promise<void> {
   const existing = await supabaseGet('reading_stats', { user_id: `eq.${stats.user_id}` });
   if (existing.length > 0) {
-    await supabasePatch('reading_stats', stats as Record<string, unknown>, { id: (existing[0] as SupabaseReadingStats).id });
+    await supabasePatch('reading_stats', stats as unknown as Record<string, unknown>, { id: (existing[0] as SupabaseReadingStats).id });
   } else {
-    await supabasePost('reading_stats', stats as Record<string, unknown>);
+    await supabasePost('reading_stats', stats as unknown as Record<string, unknown>);
   }
 }
 
@@ -232,5 +235,6 @@ export async function createBackup(userId: string, data: unknown): Promise<void>
 }
 
 export async function fetchBackups(userId: string): Promise<Array<{ id: string; data: unknown; created_at: number }>> {
-  return supabaseGet('backups', { user_id: `eq.${userId}`, order: 'created_at.desc', limit: '10' }) as Promise<Array<{ id: string; data: unknown; created_at: number }>>;
+  const rows = await supabaseGet('backups', { user_id: `eq.${userId}`, order: 'created_at.desc', limit: '10' });
+  return rows as Array<{ id: string; data: unknown; created_at: number }>;
 }
